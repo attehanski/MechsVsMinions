@@ -11,25 +11,13 @@ namespace MvM
 
         }
 
-        public override bool CanMove(Tools.Direction direction)
+        public override bool CanBeReplaced(Unit replacingUnit, Tools.Direction direction)
         {
-            MapSquare targetSquare = mapSquare.GetNeighbour(direction);
-
-            // Check if target square is movable
-            bool squareMovable = targetSquare != null && targetSquare.CanMoveToSquare(this, direction);
-            // Check if target square has a unit that can be moved on or pushed
-            bool squareIsFree = false;
-
-            if (targetSquare.unit != null)
-            {
-                if (targetSquare.unit is Minion || 
-                    targetSquare.unit is CrystalDestroyable || 
-                    targetSquare.unit is CrystalPickable ||
-                    (targetSquare.unit.canBePushed && targetSquare.unit.CanMove(direction)))
-                    squareIsFree = true;
-            }
-
-            return squareMovable && squareIsFree;
+            if (replacingUnit is Minion)
+                return false;
+            else if (replacingUnit is Champion /*|| replacingUnit is Bomb*/)
+                return CanMove(direction);
+            return true;
         }
 
         public override void Collide(Unit collisionTarget)

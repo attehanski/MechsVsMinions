@@ -8,7 +8,7 @@ namespace MvM
     {
         public MapSquare borderSquareCreator;
 
-        public override bool CanMoveToSquare(Unit incomingUnit, Tools.Direction moveDirection)
+        public override bool CanEnterSquare(Unit incomingUnit, Tools.Direction moveDirection)
         {
             return false;
         }

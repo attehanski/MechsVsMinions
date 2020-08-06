@@ -47,32 +47,34 @@ namespace MvM
             yield return null;
         }
 
+        #region Movement functions
+
         /// <summary>
         /// Adds a move command towards given direction to the stack.
         /// </summary>
         /// <param name="direction"></param>
         public virtual void Move(Tools.Direction direction)
         {
-            if (CanMove(direction))
-                actionStack.Push(new MoveAction(this, direction));
+            actionStack.Push(new MoveAction(this, direction));
         }
 
         public virtual void Move(Tools.Facing moveTowards)
         {
-            if (CanMove(moveTowards))
-                actionStack.Push(new MoveAction(this, Tools.GetDirectionFromFacing(moveTowards, facingDirection)));
+            actionStack.Push(new MoveAction(this, Tools.GetDirectionFromFacing(moveTowards, facingDirection)));
+        }
+
+        public virtual void AttemptMove(Tools.Direction direction)
+        {
+            if (CanMove(direction))
+                ChangeSquare(mapSquare.GetNeighbour(direction), direction);
+            else
+                mapSquare.GetNeighbour(direction).FailedEnteringSquare(this);
         }
 
         public virtual bool CanMove(Tools.Direction direction)
         {
             MapSquare targetSquare = mapSquare.GetNeighbour(direction);
-
-            // Check if target square is movable
-            bool squareMovable = targetSquare != null && targetSquare.CanMoveToSquare(this, direction);
-            // Check if target square has a unit
-            bool squareIsFree = targetSquare.unit == null;
-
-            return squareMovable && squareIsFree;
+            return targetSquare != null && targetSquare.CanEnterSquare(this, direction);
         }
 
         public virtual bool CanMove(Tools.Facing moveFacing)
@@ -80,6 +82,33 @@ namespace MvM
             Tools.Direction moveDirection = Tools.GetDirectionFromFacing(moveFacing, facingDirection);
             return CanMove(moveDirection);
         }
+
+        public virtual bool CanBeReplaced(Unit replacingUnit, Tools.Direction direction)
+        {
+            return false;
+        }
+
+        public virtual void ChangeSquare(MapSquare newSquare, Tools.Direction moveDirection)
+        {
+            newSquare.MoveToSquare(this, moveDirection);
+
+            mapSquare.unit = null;
+            mapSquare = newSquare;
+            newSquare.unit = this;
+        }
+
+        public virtual void Collide(Unit collisionTarget)
+        {
+            // Handle whatever happens to this unit
+            collisionTarget.IsCollided(this);
+        }
+
+        public virtual void IsCollided(Unit collidingUnit)
+        {
+            mapSquare.unit = collidingUnit;
+        }
+
+        #endregion
 
         /// <summary>
         /// Adds a rotate command towards a given direction to the stack.
@@ -98,24 +127,6 @@ namespace MvM
         public virtual void TakeDamage(Tools.Color damageColor = Tools.Color.None)
         {
             //Debug.Log("Unit " + name + " took damage!");
-        }
-
-        public virtual void ChangeSquare(MapSquare newSquare)
-        {
-            mapSquare.unit = null;
-            mapSquare = newSquare;
-            newSquare.unit = this;
-        }
-
-        public virtual void Collide(Unit collisionTarget)
-        {
-            // Handle whatever happens to this unit
-            collisionTarget.IsCollided(this);
-        }
-
-        public virtual void IsCollided(Unit collidingUnit)
-        {
-            mapSquare.unit = collidingUnit;
         }
 
         public virtual void ToggleHighlight(bool toggle)

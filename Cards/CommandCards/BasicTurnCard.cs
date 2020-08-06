@@ -40,7 +40,7 @@ namespace MvM
 
         public override void Input(MapSquare squareInput)
         {
-            actions.Push(new TurnAction(unit, unit.mapSquare.GetNeighbourDirection(squareInput)));
+            unit.Turn(unit.mapSquare.GetNeighbourDirection(squareInput));
             inputReceived = true;
         }
 

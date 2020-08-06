@@ -13,16 +13,9 @@ namespace MvM
             Destroy(gameObject);
         }
 
-        public override bool CanMove(Tools.Direction direction)
+        public override bool CanBeReplaced(Unit replacingUnit, Tools.Direction direction)
         {
-            MapSquare targetSquare = mapSquare.GetNeighbour(direction);
-
-            // Check if target square is movable
-            bool squareMovable = targetSquare != null && targetSquare.CanMoveToSquare(this, direction);
-            // Check if target square has a unit
-            bool squareIsFree = targetSquare.unit == null;
-
-            return squareMovable && squareIsFree;
+            return true;
         }
 
         public override void Collide(Unit collidingUnit)

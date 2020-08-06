@@ -114,17 +114,24 @@ namespace MvM
             return Tools.Direction.None;
         }
 
+        public virtual void FailedEnteringSquare(Unit movingUnit)
+        {
+            Debug.Log("Unit " + movingUnit.gameObject.name + "failed to move to square " + gameObject.name);
+        }
+
         public virtual void MoveToSquare(Unit movingUnit, Tools.Direction direction)
         {
             if (unit)
+            {
+                unit.IsCollided(movingUnit);
                 movingUnit.Collide(unit);
-            movingUnit.ChangeSquare(this); // NOTE: This probably needs to change for cases where we can't take up this space. Needs to be checked.
-        }
-
-        // NOTE: This could possibly be removed and just use simple bool instead
-        public virtual bool CanMoveToSquare(Unit incomingUnit, Tools.Direction moveDirection)
+            }
+        }        
+        
+        public virtual bool CanEnterSquare(Unit incomingUnit, Tools.Direction moveDirection)
         {
-            return enterable;
+            bool unitWillBlockEnter = unit && !unit.CanBeReplaced(incomingUnit, moveDirection);
+            return enterable && !unitWillBlockEnter;
         }
 
         public KeyValuePair<Tools.Direction, MapSquare> CheckNeighbourState(MapSquare origin, MapSquare other)

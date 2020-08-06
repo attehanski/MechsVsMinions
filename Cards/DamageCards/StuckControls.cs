@@ -20,15 +20,9 @@ namespace MvM
         public override void ExecuteCard()
         {
             if (isMove)
-                GameMaster.Instance.currentPlayer.character.actionStack.Push(
-                    new MoveAction(
-                        GameMaster.Instance.currentPlayer.character, 
-                        Tools.GetDirectionFromFacing(direction, GameMaster.Instance.currentPlayer.character.facingDirection)));
+                GameMaster.Instance.currentPlayer.character.Move(direction);
             else
-                GameMaster.Instance.currentPlayer.character.actionStack.Push(
-                    new TurnAction(
-                        GameMaster.Instance.currentPlayer.character,
-                        Tools.GetDirectionFromFacing(direction, GameMaster.Instance.currentPlayer.character.facingDirection)));
+                GameMaster.Instance.currentPlayer.character.Turn(direction);
 
             GameMaster.Instance.currentPlayer.character.ExecuteActions();
         }

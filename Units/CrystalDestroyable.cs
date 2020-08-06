@@ -13,6 +13,11 @@ namespace MvM
             Destroy(gameObject);
         }
 
+        public override bool CanBeReplaced(Unit replacingUnit, Tools.Direction direction)
+        {
+            return true;
+        }
+
         public override void IsCollided(Unit collidingUnit)
         {
             base.IsCollided(collidingUnit);

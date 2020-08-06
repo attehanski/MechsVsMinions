@@ -16,7 +16,7 @@ namespace MvM
         public override void ExecuteCard()
         {
             damageDir = GameMaster.Instance.GetRandomDirection();
-            GameMaster.Instance.currentPlayer.character.actionStack.Push(new TurnAction(GameMaster.Instance.currentPlayer.character, damageDir));
+            GameMaster.Instance.currentPlayer.character.Turn(damageDir);
             GameMaster.Instance.currentPlayer.character.ExecuteActions();
         }
 

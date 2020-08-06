@@ -15,16 +15,10 @@ namespace MvM
         {
             for (int i = 0; i < 3; i++)
             {
-                GameMaster.Instance.currentPlayer.character.actionStack.Push(
-                    new MoveAction(
-                        GameMaster.Instance.currentPlayer.character,
-                        Tools.GetDirectionFromFacing(Tools.Facing.Forward, GameMaster.Instance.currentPlayer.character.facingDirection)));
+                GameMaster.Instance.currentPlayer.character.Move(Tools.Facing.Forward);
             }
 
-            GameMaster.Instance.currentPlayer.character.actionStack.Push(
-                new TurnAction(
-                    GameMaster.Instance.currentPlayer.character,
-                    Tools.GetDirectionFromFacing(Tools.Facing.Back, GameMaster.Instance.currentPlayer.character.facingDirection)));
+            GameMaster.Instance.currentPlayer.character.Turn(Tools.Facing.Back);
 
             GameMaster.Instance.currentPlayer.character.ExecuteActions();
         }

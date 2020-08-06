@@ -6,6 +6,11 @@ namespace MvM
 {
     public class CrystalPickable : Unit
     {
+        public override bool CanBeReplaced(Unit replacingUnit, Tools.Direction direction)
+        {
+            return true;
+        }
+
         public override void IsCollided(Unit collidingUnit)
         {
             if (collidingUnit is Champion)

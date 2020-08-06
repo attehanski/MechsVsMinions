@@ -15,10 +15,8 @@ namespace MvM
                 movingUnit.TakeDamage();
                 GameMaster.Instance.scenario.MinionReachedSchool();
             }
-            if (unit)
-                movingUnit.Collide(unit);
 
-            movingUnit.ChangeSquare(this); // NOTE: This probably needs to change for cases where we can't take up this space. Needs to be checked.
+            base.MoveToSquare(movingUnit, direction);
         }
     }
 }

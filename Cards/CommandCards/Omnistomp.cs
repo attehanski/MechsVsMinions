@@ -33,7 +33,7 @@ namespace MvM
                 {
                     temp = temp.GetNeighbour(moveDir);
 
-                    if (!temp.CanMoveToSquare(GameMaster.Instance.currentPlayer.character, moveDir))
+                    if (!temp.CanEnterSquare(GameMaster.Instance.currentPlayer.character, moveDir))
                     {
                         if (prev)
                             inputSquares[prev] = MapSquare.Interactable.Interactable;
@@ -76,13 +76,7 @@ namespace MvM
 
             for (int i = 1; i <= level; i++)
             {
-                if (temp != null && temp.CanMoveToSquare(unit, moveDirection))
-                {
-                    unit.actionStack.Push(new MoveAction(unit, moveDirection));
-                    temp = temp.GetNeighbour(moveDirection);
-                }
-                else
-                    break;
+                unit.Move(moveDirection);
             }
 
             base.ExecuteCard();

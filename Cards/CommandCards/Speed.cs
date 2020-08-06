@@ -33,7 +33,7 @@ namespace MvM
                 {
                     if (i < minMaxMoves.x)
                         inputSquares.Add(temp, MapSquare.Interactable.Uninteractable);
-                    else if (i <= minMaxMoves.y && temp.CanMoveToSquare(unit, startFacing))
+                    else if (i <= minMaxMoves.y && temp.CanEnterSquare(unit, startFacing))
                         inputSquares.Add(temp, MapSquare.Interactable.Interactable);
 
                     temp = temp.GetNeighbour(startFacing);
@@ -55,7 +55,7 @@ namespace MvM
             MapSquare temp = startSquare;
             while (temp != squareInput)
             {
-                unit.actionStack.Push(new MoveAction(unit, startFacing));
+                unit.Move(startFacing);
                 temp = temp.GetNeighbour(startFacing);
             }
             inputReceived = true;
@@ -72,13 +72,7 @@ namespace MvM
 
             for (int i = 1; i <= minMaxMoves.y; i++)
             {
-                if (temp != null && temp.CanMoveToSquare(unit, startFacing))
-                {
-                    unit.actionStack.Push(new MoveAction(unit, startFacing));
-                    temp = temp.GetNeighbour(startFacing);
-                }
-                else
-                    break;
+                unit.Move(startFacing);
             }
 
             base.NoViableInputOptions();

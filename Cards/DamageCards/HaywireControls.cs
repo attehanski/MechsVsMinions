@@ -18,7 +18,7 @@ namespace MvM
             damageDir = GameMaster.Instance.GetRandomDirection();
             for (int i = 0; i < 2; i++)
             {
-                GameMaster.Instance.currentPlayer.character.actionStack.Push(new MoveAction(GameMaster.Instance.currentPlayer.character, damageDir));
+                GameMaster.Instance.currentPlayer.character.Move(damageDir);
             }
             GameMaster.Instance.currentPlayer.character.ExecuteActions();
         }
