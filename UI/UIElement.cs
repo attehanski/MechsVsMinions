@@ -6,11 +6,12 @@ namespace MvM
 {
     public class UIElement : MonoBehaviour
     {
-        public GameObject highlight;
+        public UIHighlight highlight;
 
-        public virtual void ToggleHighlight(bool on)
+        public virtual void SetHighlightState(UIHighlight.HighlightState highlightState)
         {
-            highlight.SetActive(on);
+            if (highlight) highlight.ChangeState(highlightState);
+            else Debug.Log("Object " + name + " highlight is: " + highlight);
         }
 
         public virtual void Show()

@@ -18,6 +18,7 @@ namespace MvM
         public override void StartState()
         {
             base.StartState();
+            UIMaster.Instance.UpdateMultiButtonState(UIMultiButton.MultiButtonState.Inactive);
         }
 
         public override void AdvanceState()
@@ -44,12 +45,14 @@ namespace MvM
         public override void AllPlayersReady()
         {
             if (minionAttackFinished)
+            {
                 base.AllPlayersReady();
+            }
             else
             {
                 GameMaster.Instance.SetAllPlayersReady(false);
-                UIMaster.Instance.UpdateContinueButton(true);
                 minionAttackFinished = true;
+                UIMaster.Instance.UpdateMultiButtonState(UIMultiButton.MultiButtonState.Ready);
             }
         }
 

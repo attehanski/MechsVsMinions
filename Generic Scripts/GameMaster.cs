@@ -249,7 +249,7 @@ namespace MvM
                 while (!commandLineFinished)
                     yield return null;
 
-                UIMaster.Instance.UpdateContinueButton(true);
+                UIMaster.Instance.UpdateMultiButtonState(UIMultiButton.MultiButtonState.Ready);
 
                 while (!currentPlayer.ready)
                     yield return null;
@@ -257,7 +257,7 @@ namespace MvM
                 currentPlayer.ready = false;
             }
 
-            UIMaster.Instance.UpdateContinueButton(true);
+            UIMaster.Instance.UpdateMultiButtonState(UIMultiButton.MultiButtonState.Ready);
 
             while (!GetAllPlayersReady())
                 yield return null;
@@ -286,7 +286,7 @@ namespace MvM
                 cardBeingExecuted = currentPlayer.commandLine.GetTopCard(i);
                 if (cardBeingExecuted != null)
                 {
-                    UIMaster.Instance.cardSlots[i].ToggleHighlight(true);
+                    UIMaster.Instance.cardSlots[i].SetHighlightState(UIHighlight.HighlightState.Available);
                     cardBeingExecuted.InitializeCardExecution(currentPlayer.character); // NOTE: hardcoded for players, requires recoding if used for other units!
 
                     // If no input is required, skip straight to execution
@@ -324,7 +324,7 @@ namespace MvM
                     yield return new WaitForSeconds(Settings.commandExecutionDelay);
                     while (currentPlayer.character.actionsInProgress)
                         yield return null;
-                    UIMaster.Instance.cardSlots[i].ToggleHighlight(false);
+                    UIMaster.Instance.cardSlots[i].SetHighlightState(UIHighlight.HighlightState.Available);
                 }
                 else
                     yield return null;
@@ -333,6 +333,28 @@ namespace MvM
             commandLineFinished = true;
             currentPlayer.character.ToggleHighlight(false);
             yield return null;
+        }
+
+        public void RepairCommandSlot(Player player, int slotIndex)
+        {
+            // Data handling
+            DiscardCard(player.commandLine.cards[slotIndex].PopTop());
+
+            // NOTE: Not sure about this being in here, data and UI should be separated more efficiently
+            // UI handling
+            UIMaster.Instance.cardSlots[slotIndex].UpdateSlotElements();
+        }
+
+        public void SwapSlots(Player player, int slotIndex1, int slotIndex2)
+        {
+            // Data handling
+            CardStack<Card> tempStack = player.commandLine.cards[slotIndex1];
+            player.commandLine.cards[slotIndex1] = player.commandLine.cards[slotIndex2];
+            player.commandLine.cards[slotIndex2] = tempStack;
+
+            // UI handling
+            UIMaster.Instance.cardSlots[slotIndex1].UpdateSlotElements();
+            UIMaster.Instance.cardSlots[slotIndex2].UpdateSlotElements();
         }
         #endregion
 
@@ -402,7 +424,7 @@ namespace MvM
 
             return (deck, discard);
         }
-        
+
         public Card DrawCard(Card.Type type)
         {
             Card drawnCard = null;
@@ -494,20 +516,21 @@ namespace MvM
         }
 
         private IEnumerator HandlePlayerDamage(Player player)
-        {            
+        {
             // NOTE: Current solution doesn't handle minion order in any way
             int damageAmount = 0;
 
             // Take damage for all cardinal directions
             List<Tools.Direction> damageDirections = new List<Tools.Direction> { Tools.Direction.North, Tools.Direction.East, Tools.Direction.West, Tools.Direction.South };
-            // if (hasSpecificDamage)
+            // if (hasSpecificDamage) // If player has the specific damage that causes them to take diagonal damage
             //  damageDirections.AddRange(new Tools.Direction[] { Tools.Direction.NorthEast, Tools.Direction.NorthWest, Tools.Direction.SouthEast, Tools.Direction.SouthWest });
             foreach (Tools.Direction dir in damageDirections)
                 if (player.character.mapSquare.HasNeighbour(dir) && player.character.mapSquare.neighbours[dir].unit is Minion)
+                {
                     damageAmount++;
-
-            // Take damage for all diagonal directions, if conditions are met
-
+                    Debug.Log("Player is taking damage from Minion on square " + player.character.mapSquare.neighbours[dir]);
+                }
+            
             for (int i = 0; i < damageAmount; i++)
             {
                 player.character.TakeDamage(Tools.Color.None);
@@ -525,7 +548,7 @@ namespace MvM
         public Tools.Direction GetRandomDirection()
         {
             // NOTE: Could change this to roll a color and get direction from compass for scenario specific differences
-            Tools.Direction[] dirOptions = new Tools.Direction[] {Tools.Direction.North, Tools.Direction.South, Tools.Direction.East, Tools.Direction.West};
+            Tools.Direction[] dirOptions = new Tools.Direction[] { Tools.Direction.North, Tools.Direction.South, Tools.Direction.East, Tools.Direction.West };
             Tools.Direction randomDir = dirOptions[Random.Range(0, 4)];
 
             // TODO: Add UI functionality
@@ -543,31 +566,146 @@ namespace MvM
         #endregion
 
         #region Experimental UI interaction
+        // NOTE: This should be removed in lieu of a better system.
+        public void UpdateUIState()
+        {
+            if (currentTurnState is TurnState_Draft)
+            {
+                if ((currentTurnState as TurnState_Draft).draftStage == 0)
+                    UIMaster.Instance.state = UIMaster.UIState.Draft;
+                else
+                    UIMaster.Instance.state = UIMaster.UIState.Slot;
+
+                //if ((UIMaster.Instance.state == UIMaster.UIState.ScrapRepair || UIMaster.Instance.state == UIMaster.UIState.ScrapSwap))
+                //{
+                //    //if (localPlayer.hand.Count > 0)
+                //    UIMaster.Instance.state = UIMaster.UIState.Slot;
+                //    //else
+                //    //    UIMaster.Instance.state = UIMaster.UIState.Wait;
+                //}
+            }
+            else if (currentTurnState is TurnState_Players)
+                UIMaster.Instance.state = UIMaster.UIState.CmdLine;
+            else if (currentTurnState is TurnState_PlayerSpawn)
+                UIMaster.Instance.state = UIMaster.UIState.PlayerSpawn;
+
+
+        }
+
         public void CardSlotInteracted(UICardSlot slot)
         {
-            TurnState_Draft turnState = currentTurnState as TurnState_Draft;
-            if (currentTurnState is TurnState_Draft && 
-                turnState.draftStage > 0 && 
-                localPlayer.currentCard != null && 
-                localPlayer.commandLine.CanSlotCard(slot.index, localPlayer.currentCard))
+            if (UIMaster.Instance.state == UIMaster.UIState.Slot)
             {
-                UIMaster.Instance.handPanel.RemoveCard(localPlayer.currentCard);
+                if ((currentTurnState as TurnState_Draft).draftStage > 0 &&
+                    localPlayer.currentCard != null &&
+                    localPlayer.commandLine.CanSlotCard(slot.index, localPlayer.currentCard))
+                {
+                    UIMaster.Instance.handPanel.RemoveCard(localPlayer.currentCard);
 
-                SlotCard(slot, localPlayer.currentCard);
-                localPlayer.currentCard = null;
+                    SlotCard(slot, localPlayer.currentCard);
+                    localPlayer.currentCard = null;
 
-                UIMaster.Instance.draftPanel.CardSlotted();
+                    UIMaster.Instance.draftPanel.CardSlotted();
+                }
+            }
+            else if (UIMaster.Instance.state == UIMaster.UIState.ScrapRepair)
+            {
+                if (localPlayer.commandLine.cards[slot.index].Count > 0 &&
+                    localPlayer.commandLine.cards[slot.index].PeekTop() is DamageCard)
+                {
+                    RepairCommandSlot(localPlayer, slot.index);
+                    UIMaster.Instance.handPanel.RemoveCard(localPlayer.currentCard);
+                    DiscardCard(localPlayer.currentCard);
+                    UIMaster.Instance.ToggleRepairScrap(localPlayer, false);
+                    UIMaster.Instance.draftPanel.CardSlotted();
+                    UpdateUIState();
+                }
+            }
+            else if (UIMaster.Instance.state == UIMaster.UIState.ScrapSwap)
+            {
+                if (localPlayer.commandLine.cards[slot.index].Count == 0 || !(localPlayer.commandLine.cards[slot.index].PeekTop() is DamageCard))
+                {
+                    UICardSlot slot1 = UIMaster.Instance.SelectedSwapItem;
+                    if (slot1 == null)
+                        UIMaster.Instance.SwapScrapInteraction(slot);
+                    else if (slot1 != slot)
+                    {
+                        SwapSlots(localPlayer, slot1.index, slot.index);
+                        UIMaster.Instance.handPanel.RemoveCard(localPlayer.currentCard);
+                        DiscardCard(localPlayer.currentCard);
+                        UIMaster.Instance.SelectedSwapItem = null;
+                        UIMaster.Instance.ToggleSwapScrap(localPlayer, false);
+                        UIMaster.Instance.draftPanel.CardSlotted();
+                        UpdateUIState();
+                    }
+                }
             }
         }
 
         public void SlotCard(UICardSlot slot, Card card)
         {
             // Data handling
-            localPlayer.commandLine.SlotCard(slot.index, card);                
+            localPlayer.commandLine.SlotCard(slot.index, card);
 
             // UI handling
             slot.SlotCard(localPlayer.currentCard);
         }
+
+        public void Scrap()
+        {
+            if (localPlayer.currentCard == null)
+                return;
+
+            Tools.Color scrapColor = (localPlayer.currentCard as CommandCard).cardColor;
+            if (scrapColor == Tools.Color.Red || scrapColor == Tools.Color.Blue)
+            {
+                int damageOptions = 0;
+                for (int i = 0; i < currentPlayer.commandLine.cards.Length; i++)
+                {
+                    if (currentPlayer.commandLine.cards[i].Count > 0 && currentPlayer.commandLine.cards[i].PeekTop() is DamageCard)
+                        damageOptions++;
+                        }
+                if (damageOptions > 0)
+                {
+                    UIMaster.Instance.state = UIMaster.UIState.ScrapRepair;
+                    UIMaster.Instance.ToggleRepairScrap(localPlayer, true);
+                }
+                else
+                {
+                    NoScrapEffect();
+                }
+            }
+
+            else if (scrapColor == Tools.Color.Yellow || scrapColor == Tools.Color.Green)
+            {
+                int unDamagedSlots = 0;
+                for (int i = 0; i < currentPlayer.commandLine.cards.Length; i++)
+                {
+                    if (currentPlayer.commandLine.cards[i].Count > 0 && !(currentPlayer.commandLine.cards[i].PeekTop() is DamageCard))
+                        unDamagedSlots++;
+                }
+                if (unDamagedSlots > 0)
+                {
+                    UIMaster.Instance.state = UIMaster.UIState.ScrapSwap;
+                    UIMaster.Instance.ToggleSwapScrap(localPlayer, true);
+                }
+                else
+                {
+                    NoScrapEffect();
+                }
+
+            }
+        }
+
+        private void NoScrapEffect()
+        {
+            UIMaster.Instance.handPanel.RemoveCard(localPlayer.currentCard);
+            DiscardCard(localPlayer.currentCard);
+            UIMaster.Instance.ToggleRepairScrap(localPlayer, false);
+            UIMaster.Instance.draftPanel.CardSlotted();
+            UpdateUIState();
+        }
+
         #endregion
     }
 }

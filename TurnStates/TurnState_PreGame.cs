@@ -20,7 +20,7 @@ namespace MvM
         public override void UpdateState()
         {
             // Add reading of scenario rules here
-            UIMaster.Instance.UpdateContinueButton(true);
+            UIMaster.Instance.UpdateMultiButtonState(UIMultiButton.MultiButtonState.Ready);
             base.UpdateState();
         }
 

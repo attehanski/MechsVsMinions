@@ -44,7 +44,13 @@ namespace MvM
         public void UnHighlightCards()
         {
             foreach (UIHandCard card in cards)
-                card.ToggleHighlight(false);
+                card.SetHighlightState(UIHighlight.HighlightState.Inactive);
+        }
+
+        public void SetHandLocked(bool locked)
+        {
+            foreach (UIHandCard card in cards)
+                card.button.interactable = !locked;
         }
     }
 }

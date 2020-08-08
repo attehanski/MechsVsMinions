@@ -17,7 +17,7 @@ namespace MvM
 
         public virtual void StartState()
         {
-
+            GameMaster.Instance.UpdateUIState();
         }
 
         public virtual void UpdateState()

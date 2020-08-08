@@ -14,6 +14,7 @@ namespace MvM
 
         public override void StartState()
         {
+            GameMaster.Instance.UpdateUIState();
             DrawDraftCards(10);
             UIMaster.Instance.draftPanel.OpenDraftPanel();
             UIMaster.Instance.commandLine.SetActive(true);
@@ -32,7 +33,7 @@ namespace MvM
                 }
             }
             else
-                UIMaster.Instance.UpdateContinueButton(false);
+                UIMaster.Instance.UpdateMultiButtonState(UIMultiButton.MultiButtonState.Inactive);
             base.UpdateState();
         }
 
@@ -44,7 +45,7 @@ namespace MvM
             // If at slotting stage, end draft and enable ready button
             else if (draftStage == 1)
             {
-                UIMaster.Instance.UpdateContinueButton(true);
+                UIMaster.Instance.UpdateMultiButtonState(UIMultiButton.MultiButtonState.Ready);
                 GameMaster.Instance.SetAllPlayersReady(false);
                 draftStage = 2;
             }
@@ -52,8 +53,10 @@ namespace MvM
             else if (draftStage == 0)
             {
                 UIMaster.Instance.draftPanel.EndDraft();
+                UIMaster.Instance.UpdateMultiButtonState(UIMultiButton.MultiButtonState.Scrap);
                 GameMaster.Instance.SetAllPlayersReady(false);
                 draftStage = 1;
+                GameMaster.Instance.UpdateUIState();
             }
             // Players have picked their first card
             else

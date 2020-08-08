@@ -31,7 +31,7 @@ namespace MvM
         {
             base.UpdateState();
             if (GameMaster.Instance.minionMovesFinished)
-                UIMaster.Instance.UpdateContinueButton(true);
+                UIMaster.Instance.UpdateMultiButtonState(UIMultiButton.MultiButtonState.Ready);
         }
     }
 }

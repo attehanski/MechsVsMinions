@@ -1,29 +1,32 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace MvM
 {
     public class UIHandCard : UIDraftCard
     {
+        public Button button;
         private UIHand hand;
 
         public void Awake()
         {
             hand = transform.parent.GetComponent<UIHand>();
+            button = GetComponent<Button>();
         }
 
         public override void SelectChoice()
         {
             hand.UnHighlightCards();
             GameMaster.Instance.localPlayer.currentCard = draftCard;
-            ToggleHighlight(true);
+            SetHighlightState(UIHighlight.HighlightState.Available);
         }
 
-        public override void ToggleHighlight(bool on)
+        public override void SetHighlightState(UIHighlight.HighlightState highlightState)
         {
-            base.ToggleHighlight(on);
-            if (on)
+            base.SetHighlightState(highlightState);
+            if (highlightState == UIHighlight.HighlightState.Available)
             {
                 transform.position = new Vector3(transform.position.x, hand.transform.position.y + 20f, 0); // NOTE: This is not easily scalable to different resolutions
                 GetComponent<Canvas>().sortingOrder = 2;

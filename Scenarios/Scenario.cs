@@ -56,7 +56,7 @@ namespace MvM
 
         public virtual void MoveMinions()
         {
-            UIMaster.Instance.UpdateContinueButton(true);
+            UIMaster.Instance.UpdateMultiButtonState(UIMultiButton.MultiButtonState.Ready);
             // This should include:
             // - the order the minions move in
             // - calculating the direction for each minion move

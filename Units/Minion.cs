@@ -10,6 +10,7 @@ namespace MvM
         {
             base.TakeDamage(damageColor);
             GameMaster.Instance.gearTracker.MinionKilled(this);
+            mapSquare.unit = null;
             Destroy(gameObject);
         }
 

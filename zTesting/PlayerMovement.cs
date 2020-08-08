@@ -6,9 +6,15 @@ namespace MvM
 {
     public class PlayerMovement : MonoBehaviour
     {
-        public Unit player;
-
         private bool inputEnabled = true;
+
+        private Unit Player
+        {
+            get
+            {
+                return GameMaster.Instance.currentPlayer.character;
+            }
+        }
 
         void Update()
         {
@@ -84,46 +90,58 @@ namespace MvM
                 GameMaster.Instance.currentPlayer.commandLine.SlotCard(2, drawnDamage);
                 UIMaster.Instance.cardSlots[2].SlotCard(drawnDamage);
             }
+
+            if (Input.GetKeyDown(KeyCode.KeypadMinus))
+                KillAllMinions();
         }
 
         private void Move(Tools.Direction dir)
         {
-            player.Move(dir);
-            player.ExecuteActions();
+            Player.Move(dir);
+            Player.ExecuteActions();
             StartCoroutine(DisableInput());
         }
 
         private void MoveMultiple(Tools.Direction dir)
         {
-            player.Move(dir);
-            player.Move(dir);
-            player.Move(dir);
-            player.ExecuteActions();
+            Player.Move(dir);
+            Player.Move(dir);
+            Player.Move(dir);
+            Player.ExecuteActions();
             StartCoroutine(DisableInput());
         }
 
         private void Rotate(Tools.Direction dir)
         {
-            player.Turn(dir);
-            player.ExecuteActions();
+            Player.Turn(dir);
+            Player.ExecuteActions();
             StartCoroutine(DisableInput());
         }
 
         private void MoveAndRotate(Tools.Direction dir1, Tools.Direction dir2, Tools.Direction dir3)
         {
-            player.Move(dir1);
-            player.Turn(dir2);
-            player.Move(dir3);
-            player.ExecuteActions();
+            Player.Move(dir1);
+            Player.Turn(dir2);
+            Player.Move(dir3);
+            Player.ExecuteActions();
             StartCoroutine(DisableInput());
         }
 
         private IEnumerator DisableInput()
         {
             inputEnabled = false;
-            while (player.actionsInProgress)
+            while (Player.actionsInProgress)
                 yield return null;
             inputEnabled = true;
+        }
+
+        private void KillAllMinions()
+        {
+            for (int i = GameMaster.Instance.gearTracker.minionsList.Count - 1; i <= 0; i--)
+            {
+                GameMaster.Instance.gearTracker.minionsList[i].mapSquare.unit = null;
+                Destroy(GameMaster.Instance.gearTracker.minionsList[i].gameObject);
+            }
         }
     }
 }

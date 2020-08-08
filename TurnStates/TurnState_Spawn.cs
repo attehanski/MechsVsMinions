@@ -27,8 +27,8 @@ namespace MvM
 
         public override void UpdateState()
         {
+            UIMaster.Instance.UpdateMultiButtonState(UIMultiButton.MultiButtonState.Ready);
             base.UpdateState();
-            UIMaster.Instance.UpdateContinueButton(true);
         }
     }
 }

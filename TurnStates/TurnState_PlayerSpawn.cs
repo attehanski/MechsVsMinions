@@ -26,7 +26,7 @@ namespace MvM
         {
             base.StartState();
 
-            UIMaster.Instance.UpdateContinueButton(false);
+            UIMaster.Instance.UpdateMultiButtonState(UIMultiButton.MultiButtonState.Inactive);
 
             foreach (MapSquare square in Object.FindObjectsOfType<MapSquare>())
                 if (square.playerSpawn)
@@ -49,7 +49,7 @@ namespace MvM
                 {
                     if (AllPlayersSpawned())
                     {
-                        UIMaster.Instance.UpdateContinueButton(true);
+                        UIMaster.Instance.UpdateMultiButtonState(UIMultiButton.MultiButtonState.Ready);
                         return;
                     }
 

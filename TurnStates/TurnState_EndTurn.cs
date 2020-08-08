@@ -16,7 +16,6 @@ namespace MvM
         {
             base.StartState();
             UIMaster.Instance.commandLine.SetActive(true);
-            UIMaster.Instance.EnableContinueButton(true);
             GameMaster.Instance.scenario.CheckEscalation();
         }
 
@@ -31,7 +30,7 @@ namespace MvM
 
         public override void UpdateState()
         {
-            UIMaster.Instance.UpdateContinueButton(true);
+            UIMaster.Instance.UpdateMultiButtonState(UIMultiButton.MultiButtonState.Ready);
             base.UpdateState();
         }
     }

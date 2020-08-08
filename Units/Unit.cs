@@ -17,6 +17,7 @@ namespace MvM
         public bool actionsInProgress = false;
 
         public Stack<Action> actionStack = new Stack<Action>();
+        private Action currentAction = null;
         
         public void ExecuteActions()
         {
@@ -30,17 +31,18 @@ namespace MvM
         private IEnumerator ExecuteStack()
         {
             actionsInProgress = true;
-            while (actionStack.Count > 0)
+            while (actionStack.Count > 0 || currentAction != null)
             {
+                currentAction = actionStack.Pop();
                 // While top item is not finished, update it
-                while (!actionStack.Peek().actionFinished)
+                while (!currentAction.actionFinished)
                 {
-                    actionStack.Peek().UpdateState();
+                    currentAction.UpdateState();
                     yield return null;
                 }
 
                 // After top item is finished, pop it
-                actionStack.Pop();
+                currentAction = null;
                 yield return null;
             }
             actionsInProgress = false;
@@ -100,7 +102,6 @@ namespace MvM
         public virtual void Collide(Unit collisionTarget)
         {
             // Handle whatever happens to this unit
-            collisionTarget.IsCollided(this);
         }
 
         public virtual void IsCollided(Unit collidingUnit)
