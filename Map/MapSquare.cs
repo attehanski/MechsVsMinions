@@ -8,8 +8,9 @@ namespace MvM
     {
         public enum Interactable
         {
-            Interactable,
-            Uninteractable,
+            ActiveChoice,
+            InactiveChoice,
+            NonfinalChoice,
             Passive
         }
 
@@ -47,6 +48,8 @@ namespace MvM
                 Destroy(editorIdentifier);
                 editorIdentifier = null;
             }
+
+            interactableState = Interactable.Passive;
         }
 
         private void Start()
@@ -160,14 +163,19 @@ namespace MvM
                     ChangeHighlightColor(isHovered ? MapInput.Instance.hoverColor : MapInput.Instance.passiveColor);
                     break;
 
-                case Interactable.Interactable:
+                case Interactable.ActiveChoice:
                     highlight.enabled = true;
                     ChangeHighlightColor(isHovered ? MapInput.Instance.interactableHoveredColor : MapInput.Instance.interactableColor);
                     break;
 
-                case Interactable.Uninteractable:
+                case Interactable.InactiveChoice:
                     highlight.enabled = true;
                     ChangeHighlightColor(isHovered ? MapInput.Instance.uninteractableHoveredColor : MapInput.Instance.uninteractableColor);
+                    break;
+
+                case Interactable.NonfinalChoice:
+                    highlight.enabled = true;
+                    ChangeHighlightColor(isHovered ? MapInput.Instance.interactableHoveredColor : MapInput.Instance.interactableColor);
                     break;
             }
         }

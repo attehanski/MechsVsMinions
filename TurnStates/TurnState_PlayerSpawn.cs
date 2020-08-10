@@ -33,7 +33,7 @@ namespace MvM
                 {
                     spawnSquares.Add(square);
                     interactableSquares.Add(square);
-                    square.interactable = MapSquare.Interactable.Interactable;
+                    square.interactable = MapSquare.Interactable.ActiveChoice;
                 }
             spawn = new PlayerSpawnData();
         }
@@ -59,7 +59,7 @@ namespace MvM
                     foreach (MapSquare square in spawnSquares)
                     {
                         interactableSquares.Add(square);
-                        square.interactable = MapSquare.Interactable.Interactable;
+                        square.interactable = MapSquare.Interactable.ActiveChoice;
                     }
                     spawn = new PlayerSpawnData();
                 }
@@ -83,7 +83,7 @@ namespace MvM
                         interactableSquares.Add(spawn.spawnPosition.GetNeighbour(Tools.Direction.South));
 
                         foreach (MapSquare square in interactableSquares)
-                            square.interactable = MapSquare.Interactable.Interactable;
+                            square.interactable = MapSquare.Interactable.ActiveChoice;
                     }
                     else if (spawn.spawnFacing == null)
                     {

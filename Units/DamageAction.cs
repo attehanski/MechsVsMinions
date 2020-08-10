@@ -22,6 +22,7 @@ namespace MvM
         {
             if (!damageDealt)
             {
+                Debug.Log("Damage action dealing damage!");
                 target.TakeDamage(damageColor);
                 damageDealt = true;
                 actionFinished = true;

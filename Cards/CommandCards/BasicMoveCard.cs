@@ -20,9 +20,7 @@ namespace MvM
         protected virtual void CreateActions()
         {
             for (int i = 1; i <= level; i++)
-            {
-                unit.Move(startFacing);
-            }
+                actions.Push(new MoveAction(unit, startFacing));
         }
     }
 }

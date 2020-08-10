@@ -137,25 +137,29 @@ namespace MvM
             #region Initialize Damage Card Deck
             for (int i = 0; i < 4; i++)
             {
-                //damageCardDeck.AddTop(new Glitch(0, 1));
-                //damageCardDeck.AddTop(new Glitch(2, 3));
-                //damageCardDeck.AddTop(new Glitch(4, 5));
+                damageCardDeck.AddTop(new Glitch(0, 1));
+                damageCardDeck.AddTop(new Glitch(2, 3));
+                damageCardDeck.AddTop(new Glitch(4, 5));
             }
             for (int i = 0; i < 3; i++)
             {
-                //damageCardDeck.AddTop(new MajorGlitch());
+                damageCardDeck.AddTop(new MajorGlitch());
                 damageCardDeck.AddTop(new StuckControls(Tools.Facing.Left, true));
                 damageCardDeck.AddTop(new StuckControls(Tools.Facing.Left, true));
-                //damageCardDeck.AddTop(new StuckControls(Tools.Facing.Right, false));
-                //damageCardDeck.AddTop(new StuckControls(Tools.Facing.Right, false));
-                //damageCardDeck.AddTop(new HaywireControls());
-                //damageCardDeck.AddTop(new HaywireRotator());
+                damageCardDeck.AddTop(new StuckControls(Tools.Facing.Right, false));
+                damageCardDeck.AddTop(new StuckControls(Tools.Facing.Right, false));
+                damageCardDeck.AddTop(new HaywireControls());
+                damageCardDeck.AddTop(new HaywireRotator());
             }
             for (int i = 0; i < 2; i++)
             {
                 damageCardDeck.AddTop(new StuckControls(Tools.Facing.Back, true));
-                //damageCardDeck.AddTop(new StuckControls(Tools.Facing.Back, false));
+                damageCardDeck.AddTop(new StuckControls(Tools.Facing.Back, false));
             }
+            // if (unlockedForScenario)
+            damageCardDeck.AddTop(new CatastrophicFailure());
+            //damageCardDeck.AddTop(new BeamMisfire());
+
 
             damageCardDeck = ShuffleDeck(damageCardDeck);
             #endregion
@@ -300,7 +304,7 @@ namespace MvM
                             {
                                 Dictionary<MapSquare, MapSquare.Interactable> inputSquares = cardBeingExecuted.GetValidInputSquares();
                                 // Failsafe
-                                if (!inputSquares.Values.Contains(MapSquare.Interactable.Interactable))
+                                if (!inputSquares.Values.Contains(MapSquare.Interactable.ActiveChoice))
                                     cardBeingExecuted.NoViableInputOptions();
                                 else
                                     MapInput.Instance.SetInteractables(inputSquares);
@@ -324,7 +328,7 @@ namespace MvM
                     yield return new WaitForSeconds(Settings.commandExecutionDelay);
                     while (currentPlayer.character.actionsInProgress)
                         yield return null;
-                    UIMaster.Instance.cardSlots[i].SetHighlightState(UIHighlight.HighlightState.Available);
+                    UIMaster.Instance.cardSlots[i].SetHighlightState(UIHighlight.HighlightState.Inactive);
                 }
                 else
                     yield return null;

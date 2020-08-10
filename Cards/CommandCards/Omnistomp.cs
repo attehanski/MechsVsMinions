@@ -36,16 +36,16 @@ namespace MvM
                     if (!temp.CanEnterSquare(GameMaster.Instance.currentPlayer.character, moveDir))
                     {
                         if (prev)
-                            inputSquares[prev] = MapSquare.Interactable.Interactable;
+                            inputSquares[prev] = MapSquare.Interactable.ActiveChoice;
                         else
-                            inputSquares.Add(temp, MapSquare.Interactable.Interactable);
+                            inputSquares.Add(temp, MapSquare.Interactable.ActiveChoice);
                         break;
                     }
 
                     if (i < level - 1)
-                        inputSquares.Add(temp, MapSquare.Interactable.Uninteractable);
+                        inputSquares.Add(temp, MapSquare.Interactable.InactiveChoice);
                     else
-                        inputSquares.Add(temp, MapSquare.Interactable.Interactable);
+                        inputSquares.Add(temp, MapSquare.Interactable.ActiveChoice);
 
                     prev = temp;
                 }

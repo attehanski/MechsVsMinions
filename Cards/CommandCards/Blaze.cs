@@ -27,7 +27,7 @@ namespace MvM
         {
             MapSquare[] endNeighbours = new MapSquare[2];
             MapSquare temp = startSquare;
-            for(int i = 0; i < actions.Count; i++) // Simulate movement until end, 
+            for(int i = 0; i < level; i++) // Simulate movement until end 
             {
                 temp = temp.GetNeighbour(startFacing);
             }

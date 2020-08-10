@@ -27,10 +27,10 @@ namespace MvM
                 foreach (KeyValuePair<Tools.Direction, MapSquare> neighbour in startSquare.neighbours)
                 {
                     if (!neighbour.Value.unit)
-                        inputSquares.Add(neighbour.Value, MapSquare.Interactable.Uninteractable);
+                        inputSquares.Add(neighbour.Value, MapSquare.Interactable.InactiveChoice);
                     else if (Tools.UnitIsEnemy(neighbour.Value.unit) &&
                         !targetSquares.Contains(neighbour.Value))
-                        inputSquares.Add(neighbour.Value, MapSquare.Interactable.Interactable);
+                        inputSquares.Add(neighbour.Value, MapSquare.Interactable.ActiveChoice);
                 }
                 return inputSquares;
             }

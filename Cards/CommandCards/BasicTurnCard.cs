@@ -22,12 +22,12 @@ namespace MvM
         {
             inputSquares = new Dictionary<MapSquare, MapSquare.Interactable>();
 
-            inputSquares.Add(startSquare.GetNeighbour(Tools.GetDirectionFromFacing(Tools.Facing.Left, startFacing)), MapSquare.Interactable.Interactable);
-            inputSquares.Add(startSquare.GetNeighbour(Tools.GetDirectionFromFacing(Tools.Facing.Right, startFacing)), MapSquare.Interactable.Interactable);
+            inputSquares.Add(startSquare.GetNeighbour(Tools.GetDirectionFromFacing(Tools.Facing.Left, startFacing)), MapSquare.Interactable.ActiveChoice);
+            inputSquares.Add(startSquare.GetNeighbour(Tools.GetDirectionFromFacing(Tools.Facing.Right, startFacing)), MapSquare.Interactable.ActiveChoice);
             if (level > 1)
-                inputSquares.Add(startSquare.GetNeighbour(Tools.GetDirectionFromFacing(Tools.Facing.Back, startFacing)), MapSquare.Interactable.Interactable);
+                inputSquares.Add(startSquare.GetNeighbour(Tools.GetDirectionFromFacing(Tools.Facing.Back, startFacing)), MapSquare.Interactable.ActiveChoice);
             if (level > 2)
-                inputSquares.Add(startSquare.GetNeighbour(Tools.GetDirectionFromFacing(Tools.Facing.Forward, startFacing)), MapSquare.Interactable.Interactable);
+                inputSquares.Add(startSquare.GetNeighbour(Tools.GetDirectionFromFacing(Tools.Facing.Forward, startFacing)), MapSquare.Interactable.ActiveChoice);
 
             return inputSquares;
         }

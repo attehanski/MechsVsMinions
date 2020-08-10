@@ -23,9 +23,9 @@ namespace MvM
                 if (!inputSquares.ContainsKey(square))
                 {
                     if (square.unit && Tools.UnitIsEnemy(square.unit))
-                        inputSquares.Add(square, MapSquare.Interactable.Interactable);
+                        inputSquares.Add(square, MapSquare.Interactable.ActiveChoice);
                     else
-                        inputSquares.Add(square, MapSquare.Interactable.Uninteractable);
+                        inputSquares.Add(square, MapSquare.Interactable.InactiveChoice);
                 }
             }
 

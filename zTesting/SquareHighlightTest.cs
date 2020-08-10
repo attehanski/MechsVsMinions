@@ -15,10 +15,10 @@ namespace MvM
             if (trigger)
             {
                 foreach (MapSquare sq in interactables)
-                    sq.interactable = MapSquare.Interactable.Interactable;
+                    sq.interactable = MapSquare.Interactable.ActiveChoice;
 
                 foreach (MapSquare sq in uninteractables)
-                    sq.interactable = MapSquare.Interactable.Uninteractable;
+                    sq.interactable = MapSquare.Interactable.InactiveChoice;
 
                 trigger = false;
             }

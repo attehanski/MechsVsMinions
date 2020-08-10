@@ -24,7 +24,7 @@ namespace MvM
         private MapSquare hoveredSquare;
         private MapSquare target;
 
-        private float inputMinDelay = 0.8f;
+        private float inputMinDelay = 0.45f;
         private float currentInputDelay = 0f;
 
         private float mapMoveHoldTime = 0.2f;
@@ -56,31 +56,32 @@ namespace MvM
                 if (hoveredSquare)
                     hoveredSquare.ToggleHover(false);
                 hoveredSquare = null;
-                return;
             }
-
-            target = hit.collider.GetComponent<MapSquare>();
-            if (target)
+            else
             {
-                if (hoveredSquare)
-                    hoveredSquare.ToggleHover(false);
-
-                target.ToggleHover(true);
-                hoveredSquare = target;
-            }
-
-            if (Input.GetButtonUp("Fire1"))
-            {
-                if (target &&
-                    target.interactable == MapSquare.Interactable.Interactable &&
-                    buttonHoldTime < mapMoveHoldTime &&
-                    currentInputDelay > inputMinDelay)
+                target = hit.collider.GetComponent<MapSquare>();
+                if (target)
                 {
-                    SquareInteracted(target);
-                    currentInputDelay = 0f;
+                    if (hoveredSquare)
+                        hoveredSquare.ToggleHover(false);
+
+                    target.ToggleHover(true);
+                    hoveredSquare = target;
                 }
 
-                buttonHoldTime = 0f;
+                if (Input.GetButtonUp("Fire1"))
+                {
+                    if (target &&
+                        target.interactable == MapSquare.Interactable.ActiveChoice &&
+                        buttonHoldTime < mapMoveHoldTime &&
+                        currentInputDelay > inputMinDelay)
+                    {
+                        SquareInteracted(target);
+                        currentInputDelay = 0f;
+                    }
+
+                    buttonHoldTime = 0f;
+                }
             }
 
             currentInputDelay += Time.deltaTime;

@@ -38,9 +38,9 @@ namespace MvM
                 {
                     MapSquare square = targets.Peek().mapSquare.GetNeighbour(direction);
                     if (square && square.unit && Tools.UnitIsEnemy(square.unit) && !targets.Contains(square.unit))
-                        inputSquares.Add(square, MapSquare.Interactable.Interactable);
+                        inputSquares.Add(square, MapSquare.Interactable.ActiveChoice);
                     else if (square)
-                        inputSquares.Add(square, MapSquare.Interactable.Uninteractable);
+                        inputSquares.Add(square, MapSquare.Interactable.InactiveChoice);
                 }
             }
 
@@ -86,9 +86,9 @@ namespace MvM
         private KeyValuePair<MapSquare, MapSquare.Interactable> GetInteractable(MapSquare square)
         {
             if (square && square.unit && Tools.UnitIsEnemy(square.unit) && !targets.Contains(square.unit))
-                return new KeyValuePair<MapSquare, MapSquare.Interactable>(square, MapSquare.Interactable.Interactable);
+                return new KeyValuePair<MapSquare, MapSquare.Interactable>(square, MapSquare.Interactable.ActiveChoice);
             else
-                return new KeyValuePair<MapSquare, MapSquare.Interactable>(square, MapSquare.Interactable.Uninteractable);
+                return new KeyValuePair<MapSquare, MapSquare.Interactable>(square, MapSquare.Interactable.InactiveChoice);
         }
     }
 }

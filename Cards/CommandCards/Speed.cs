@@ -32,9 +32,9 @@ namespace MvM
                 if (temp != null)
                 {
                     if (i < minMaxMoves.x)
-                        inputSquares.Add(temp, MapSquare.Interactable.Uninteractable);
+                        inputSquares.Add(temp, MapSquare.Interactable.InactiveChoice);
                     else if (i <= minMaxMoves.y && temp.CanEnterSquare(unit, startFacing))
-                        inputSquares.Add(temp, MapSquare.Interactable.Interactable);
+                        inputSquares.Add(temp, MapSquare.Interactable.ActiveChoice);
 
                     temp = temp.GetNeighbour(startFacing);
                 }
