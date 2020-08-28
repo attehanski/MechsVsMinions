@@ -41,6 +41,7 @@ namespace MvM
             }
         }
 
+        #region Initialization
         private void Awake()
         {
             if (editorIdentifier)
@@ -64,6 +65,24 @@ namespace MvM
                 GameMaster.Instance.gearTracker.minionsList.Add(GameMaster.Instance.SpawnUnit(Prefabs.Instance.minion, this));
         }
 
+        protected virtual void GenerateBorderSquares()
+        {
+            foreach (Tools.Direction direction in System.Enum.GetValues(typeof(Tools.Direction)))
+                if (!neighbours.ContainsKey(direction) && direction != Tools.Direction.None)
+                {
+                    BorderSquare borderSquare = Instantiate(
+                        Prefabs.Instance.borderSquare,
+                        transform.position + Tools.GetDirectionVector(direction),
+                        Quaternion.identity,
+                        transform.parent).GetComponent<BorderSquare>();
+                    borderSquare.name = direction.ToString();
+                    borderSquare.borderSquareCreator = this;
+                    neighbours.Add(direction, borderSquare);
+                }
+        }
+        #endregion
+
+        #region Neighbours
         private void GetNeighbours()
         {
             foreach (Collider col in Physics.OverlapBox(transform.position, new Vector3(0.6f, 0.6f, 0.6f)))
@@ -75,22 +94,6 @@ namespace MvM
                 if (potentialNeighbour.Key != Tools.Direction.None && !neighbours.ContainsKey(potentialNeighbour.Key))
                     neighbours.Add(potentialNeighbour.Key, potentialNeighbour.Value);
             }
-        }
-
-        protected virtual void GenerateBorderSquares()
-        {
-            foreach(Tools.Direction direction in System.Enum.GetValues(typeof(Tools.Direction)))
-                if(!neighbours.ContainsKey(direction) && direction != Tools.Direction.None)
-                {
-                    BorderSquare borderSquare = Instantiate(
-                        Prefabs.Instance.borderSquare, 
-                        transform.position + Tools.GetDirectionVector(direction), 
-                        Quaternion.identity, 
-                        transform.parent).GetComponent<BorderSquare>();
-                    borderSquare.name = direction.ToString();
-                    borderSquare.borderSquareCreator = this;
-                    neighbours.Add(direction, borderSquare);
-                }
         }
 
         public bool HasNeighbour(Tools.Direction direction)
@@ -117,6 +120,19 @@ namespace MvM
             return Tools.Direction.None;
         }
 
+        public KeyValuePair<Tools.Direction, MapSquare> CheckNeighbourState(MapSquare origin, MapSquare other)
+        {
+            // If squares are not neighbours or they are the same one, return a none value.
+            float distance = Vector3.Distance(origin.transform.position, other.transform.position);
+
+            if (distance > 1.7f || distance < 0.9f)
+                return new KeyValuePair<Tools.Direction, MapSquare>(Tools.Direction.None, other);
+
+            Tools.Direction dir = Tools.GetDirection(origin, other);
+            return new KeyValuePair<Tools.Direction, MapSquare>(dir, other);
+        }
+        #endregion
+
         public virtual void FailedEnteringSquare(Unit movingUnit)
         {
             Debug.Log("Unit " + movingUnit.gameObject.name + "failed to move to square " + gameObject.name);
@@ -137,18 +153,6 @@ namespace MvM
             return enterable && !unitWillBlockEnter;
         }
 
-        public KeyValuePair<Tools.Direction, MapSquare> CheckNeighbourState(MapSquare origin, MapSquare other)
-        {
-            // If squares are not neighbours or they are the same one, return a none value.
-            float distance = Vector3.Distance(origin.transform.position, other.transform.position);
-
-            if (distance > 1.7f || distance < 0.9f)
-                return new KeyValuePair<Tools.Direction, MapSquare>(Tools.Direction.None, other);
-
-            Tools.Direction dir = Tools.GetDirection(origin, other);
-            return new KeyValuePair<Tools.Direction, MapSquare>(dir, other);
-        }
-
         public void ChangeHighlightColor(Color col)
         {
             highlight.material.color = col;
@@ -160,22 +164,22 @@ namespace MvM
             {
                 case Interactable.Passive:
                     highlight.enabled = isHovered;
-                    ChangeHighlightColor(isHovered ? MapInput.Instance.hoverColor : MapInput.Instance.passiveColor);
+                    ChangeHighlightColor(isHovered ? MapInput.Instance.colors.hoverColor : MapInput.Instance.colors.passiveColor);
                     break;
 
                 case Interactable.ActiveChoice:
                     highlight.enabled = true;
-                    ChangeHighlightColor(isHovered ? MapInput.Instance.interactableHoveredColor : MapInput.Instance.interactableColor);
+                    ChangeHighlightColor(isHovered ? MapInput.Instance.colors.interactableHoveredColor : MapInput.Instance.colors.interactableColor);
                     break;
 
                 case Interactable.InactiveChoice:
                     highlight.enabled = true;
-                    ChangeHighlightColor(isHovered ? MapInput.Instance.uninteractableHoveredColor : MapInput.Instance.uninteractableColor);
+                    ChangeHighlightColor(isHovered ? MapInput.Instance.colors.uninteractableHoveredColor : MapInput.Instance.colors.uninteractableColor);
                     break;
 
                 case Interactable.NonfinalChoice:
                     highlight.enabled = true;
-                    ChangeHighlightColor(isHovered ? MapInput.Instance.interactableHoveredColor : MapInput.Instance.interactableColor);
+                    ChangeHighlightColor(isHovered ? MapInput.Instance.colors.nonfinalHoveredColor : MapInput.Instance.colors.nonfinalColor);
                     break;
             }
         }

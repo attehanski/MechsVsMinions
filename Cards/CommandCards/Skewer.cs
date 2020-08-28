@@ -11,7 +11,7 @@ namespace MvM
         public Skewer()
         {
             cardColor = Tools.Color.Blue;
-            inputRequired = false;
+            //inputRequired = false;
             text = "Skewer";
             textureAsset = Resources.Load<Sprite>("CommandCardTextures/T_Skewer");
         }

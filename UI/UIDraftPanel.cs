@@ -20,14 +20,25 @@ namespace MvM
             
             GetComponent<CanvasGroup>().alpha = 1f;
             TurnState_Draft turnStateScr = (TurnState_Draft)GameMaster.Instance.currentTurnState;
+            float panelWidth = GetComponent<RectTransform>().rect.size.x * GetComponentInParent<Canvas>().scaleFactor;
+            float cardBuffer = panelWidth / 100f;
+            float slotWidth = 0.2f * (panelWidth - 6 * cardBuffer);
+            float step = slotWidth + cardBuffer;
+            float startPos = (cardBuffer + slotWidth / 2) - panelWidth / 2;
+
+            float panelHeight = GetComponent<RectTransform>().rect.size.y * GetComponentInParent<Canvas>().scaleFactor;
+            float heightBuffer = 3f * panelHeight / 100f;
+            float slotHeight = 0.5f * (panelHeight - 3 * heightBuffer);
+            float heightStep = slotHeight + heightBuffer;
+            float heightStartPos = (heightBuffer + slotHeight / 2) - panelHeight / 2;
 
             for (int i = 0; i < turnStateScr.draftCards.Count; i++)
             {
                 float xPos;
                 if (i < 5)
-                    xPos = -230f + i * 115f;
+                    xPos = startPos + i * step;
                 else
-                    xPos = -230f + (i - 5) * 115f;
+                    xPos = startPos + (i - 5) * step;
 
                 float yPos;
                 if (turnStateScr.draftCards.Count <= 5)
@@ -35,16 +46,29 @@ namespace MvM
                 else
                 {
                     if (i < 5)
-                        yPos = 70f;
+                        yPos = heightStartPos;
                     else
-                        yPos = -85f;
+                        yPos = -heightStartPos;
                 }
 
-                UIDraftCard card = Instantiate(Prefabs.Instance.draftCard, transform.position + new Vector3(xPos, yPos, 0f), Quaternion.identity, transform).GetComponent<UIDraftCard>();
+                UIDraftCard card = Instantiate(Prefabs.Instance.draftCard, transform).GetComponent<UIDraftCard>();
+                card.transform.position = transform.position + new Vector3(xPos, yPos, 0f);
+                card.transform.rotation = Quaternion.identity;
+                card.GetComponent<Canvas>().overrideSorting = false;
                 card.InitCard(turnStateScr.draftCards[i]);
                 draftCards.Add(card);
             }
             hidden = false;
+        }
+
+        public void ClearDraftPanel()
+        {
+            int lastIndex = draftCards.Count - 1;
+            for (int i = 0; i < draftCards.Count; i++)
+            {
+                Destroy(draftCards[lastIndex - i].gameObject);
+            }
+            draftCards.Clear();
         }
 
         public void HideDraftPanel()

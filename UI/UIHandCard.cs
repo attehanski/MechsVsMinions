@@ -26,15 +26,17 @@ namespace MvM
         public override void SetHighlightState(UIHighlight.HighlightState highlightState)
         {
             base.SetHighlightState(highlightState);
+            Canvas canvas = GetComponent<Canvas>();
+            canvas.overrideSorting = true;
             if (highlightState == UIHighlight.HighlightState.Available)
             {
                 transform.position = new Vector3(transform.position.x, hand.transform.position.y + 20f, 0); // NOTE: This is not easily scalable to different resolutions
-                GetComponent<Canvas>().sortingOrder = 2;
+                canvas.sortingOrder = 2;
             }
             else
             {
                 transform.position = new Vector3(transform.position.x, hand.transform.position.y - 10f, 0); // NOTE: This is not easily scalable to different resolutions
-                GetComponent<Canvas>().sortingOrder = 1;
+                canvas.sortingOrder = 1;
             }
         }
 

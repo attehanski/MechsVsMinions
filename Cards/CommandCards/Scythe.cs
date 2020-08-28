@@ -6,15 +6,21 @@ namespace MvM
 {
     public class Scythe : BasicTurnCard
     {
-        private List<MapSquare> targetSquares = new List<MapSquare>();
+        private int damageActionsDone = 0;
         private bool turnInputReceived = false;
 
         public Scythe()
         {
             cardColor = Tools.Color.Blue;
-            inputRequired = true;
             text = "Scythe";
             textureAsset = Resources.Load<Sprite>("CommandCardTextures/T_Scythe");
+        }
+
+        public override void InitializeCardExecution(Unit executingUnit)
+        {
+            base.InitializeCardExecution(executingUnit);
+            turnInputReceived = false;
+            damageActionsDone = 0;
         }
 
         public override Dictionary<MapSquare, MapSquare.Interactable> GetValidInputSquares()
@@ -28,8 +34,7 @@ namespace MvM
                 {
                     if (!neighbour.Value.unit)
                         inputSquares.Add(neighbour.Value, MapSquare.Interactable.InactiveChoice);
-                    else if (Tools.UnitIsEnemy(neighbour.Value.unit) &&
-                        !targetSquares.Contains(neighbour.Value))
+                    else if (Tools.UnitIsEnemy(neighbour.Value.unit))
                         inputSquares.Add(neighbour.Value, MapSquare.Interactable.ActiveChoice);
                 }
                 return inputSquares;
@@ -42,25 +47,26 @@ namespace MvM
             {
                 base.Input(squareInput);
                 turnInputReceived = true;
-                inputReceived = false;
             }
             else
             {
-                targetSquares.Add(squareInput);
+                damageActionsDone++;
                 actions.Push(new DamageAction(unit, cardColor, squareInput.unit));
             }
         }
 
         public override void UpdateCardState()
         {
-            if (targetSquares.Count == level)
-                readyToExecute = true;
+            if (damageActionsDone == level)
+            {
+                cardState = CardState.Finished;
+            }
+            else
+                cardState = CardState.RequiresInput;
         }
 
         public override void ExecuteCard()
         {
-            turnInputReceived = false;
-            targetSquares.Clear();
             base.ExecuteCard();
         }
     }

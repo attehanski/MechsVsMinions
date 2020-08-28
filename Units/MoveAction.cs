@@ -25,7 +25,6 @@ namespace MvM
             // First initialize and handle the logic
             if (!actionInProgress)
             {
-                Debug.Log("Starting move action!");
                 startPos = unit.transform.position;
                 unit.AttemptMove(moveDirection);
                 targetSquare = unit.mapSquare;
@@ -42,7 +41,6 @@ namespace MvM
                 }
                 else
                 {
-                    Debug.Log("Finished move action!");
                     actionFinished = true;
                 }
             }

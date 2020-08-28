@@ -14,6 +14,12 @@ namespace MvM
             textureAsset = Resources.Load<Sprite>("CommandCardTextures/T_Flamespitter");
         }
 
+        public override void InitializeCardExecution(Unit executingUnit)
+        {
+            base.InitializeCardExecution(executingUnit);
+            cardState = CardState.NoInputRequired;
+        }
+
         public override void ExecuteCard()
         {
             foreach (MapSquare targetSquare in GetTargetSquares())
@@ -28,7 +34,7 @@ namespace MvM
             MapSquare temp = startSquare;
             for (int i = 0; i < 2; i++)
             {
-                temp = temp.GetNeighbour(Tools.GetDirectionFromFacing(Tools.Facing.Forward, startFacing));
+                temp = temp.GetNeighbour(Tools.GetDirectionFromFacing(Tools.Facing.Forward, startFacingDirection));
                 if (temp)
                     targetSquares.Enqueue(temp);
             }
@@ -38,12 +44,12 @@ namespace MvM
                 {
                     if (!targetSquares.Contains(temp))
                         targetSquares.Enqueue(temp);
-                    if (temp.GetNeighbour(Tools.GetDirectionFromFacing(Tools.Facing.Right, startFacing)))
-                        targetSquares.Enqueue(temp.GetNeighbour(Tools.GetDirectionFromFacing(Tools.Facing.Right, startFacing)));
-                    if (temp.GetNeighbour(Tools.GetDirectionFromFacing(Tools.Facing.Left, startFacing)))
-                        targetSquares.Enqueue(temp.GetNeighbour(Tools.GetDirectionFromFacing(Tools.Facing.Left, startFacing)));
+                    if (temp.GetNeighbour(Tools.GetDirectionFromFacing(Tools.Facing.Right, startFacingDirection)))
+                        targetSquares.Enqueue(temp.GetNeighbour(Tools.GetDirectionFromFacing(Tools.Facing.Right, startFacingDirection)));
+                    if (temp.GetNeighbour(Tools.GetDirectionFromFacing(Tools.Facing.Left, startFacingDirection)))
+                        targetSquares.Enqueue(temp.GetNeighbour(Tools.GetDirectionFromFacing(Tools.Facing.Left, startFacingDirection)));
 
-                temp = temp.GetNeighbour(Tools.GetDirectionFromFacing(Tools.Facing.Forward, startFacing));
+                temp = temp.GetNeighbour(Tools.GetDirectionFromFacing(Tools.Facing.Forward, startFacingDirection));
                 }
             }
 

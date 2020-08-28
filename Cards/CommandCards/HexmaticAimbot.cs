@@ -48,13 +48,12 @@ namespace MvM
         public override void Input(MapSquare squareInput)
         {
             actions.Push(new DamageAction(unit, cardColor, squareInput.unit));
-            inputReceived = true;
         }
 
         public override void UpdateCardState()
         {
-            if (inputReceived)
-                readyToExecute = true;
+            if (actionsExecuted)
+                cardState = CardState.Finished;
         }
     }
 }

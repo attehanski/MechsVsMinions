@@ -127,7 +127,39 @@ namespace MvM
 
         public virtual void TakeDamage(Tools.Color damageColor = Tools.Color.None)
         {
+            ShowDamageEffect(damageColor);
             //Debug.Log("Unit " + name + " took damage!");
+        }
+
+        protected virtual void ShowDamageEffect(Tools.Color damageColor)
+        {
+            switch(damageColor)
+            {
+                case Tools.Color.Blue:
+                    if (Prefabs.Instance.blueDamageEffect)
+                        Instantiate(Prefabs.Instance.blueDamageEffect, transform.position, Quaternion.identity);
+                    return;
+
+                case Tools.Color.Green:
+                    if (Prefabs.Instance.greenDamageEffect)
+                        Instantiate(Prefabs.Instance.greenDamageEffect, transform.position, Quaternion.identity);
+                    return;
+
+                case Tools.Color.Red:
+                    if (Prefabs.Instance.redDamageEffect)
+                        Instantiate(Prefabs.Instance.redDamageEffect, transform.position, Quaternion.identity);
+                    return;
+
+                case Tools.Color.Yellow:
+                    if (Prefabs.Instance.yellowDamageEffect)
+                        Instantiate(Prefabs.Instance.yellowDamageEffect, transform.position, Quaternion.identity);
+                    return;
+
+                case Tools.Color.None:
+                    if (Prefabs.Instance.colorlessDamageEffect)
+                        Instantiate(Prefabs.Instance.colorlessDamageEffect, transform.position, Quaternion.identity);
+                    return;
+            }
         }
 
         public virtual void ToggleHighlight(bool toggle)

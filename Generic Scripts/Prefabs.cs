@@ -10,6 +10,13 @@ namespace MvM
         public GameObject minion;
         public GameObject genericChampion;
 
+        [Header("Damage effects")]
+        public GameObject colorlessDamageEffect;
+        public GameObject blueDamageEffect;
+        public GameObject redDamageEffect;
+        public GameObject yellowDamageEffect;
+        public GameObject greenDamageEffect;
+
         [Header("UI")]
         public GameObject commandCard;
         public GameObject draftCard;

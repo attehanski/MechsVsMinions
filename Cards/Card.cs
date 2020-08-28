@@ -15,31 +15,44 @@ namespace MvM
             Boss
         }
 
+        public enum CardState
+        {
+            Finished,
+            RequiresInput,
+            InputOrFinish,
+            InputReceived,
+            NoInputRequired
+        }
+
         public string text;
         public Type type;
         public bool inputRequired = false;
         public Sprite textureAsset;
 
         // Values for input handling during card execution
-        public bool inputReceived = false;
-        public bool readyToExecute = false;
+        public CardState cardState = CardState.RequiresInput;
         protected Unit unit;
         protected MapSquare startSquare;
-        protected Tools.Direction startFacing;
+        protected Tools.Direction startFacingDirection;
+
+        protected bool actionsExecuted = false;
 
         public virtual void UpdateCardState()
         {
-            readyToExecute = true;
+            cardState = CardState.Finished;
         }
 
-        public virtual void InitializeCardExecution(Unit unit)
+        public virtual void InitializeCardExecution(Unit executingUnit)
         {
-
+            cardState = CardState.RequiresInput;
+            unit = executingUnit;
+            startSquare = executingUnit.mapSquare;
+            startFacingDirection = executingUnit.facingDirection;
         }
 
         public virtual void ExecuteCard()
         {
-
+            actionsExecuted = true;
         }
 
         public virtual void Input(MapSquare squareInput)
@@ -52,7 +65,8 @@ namespace MvM
         /// </summary>
         public virtual void NoViableInputOptions()
         {
-            readyToExecute = true;
+            Debug.Log("NoViableInputOptions!");
+            cardState = CardState.Finished;
         }        
 
         public virtual Dictionary<MapSquare, MapSquare.Interactable> GetValidInputSquares()

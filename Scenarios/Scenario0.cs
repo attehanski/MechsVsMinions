@@ -9,6 +9,9 @@ namespace MvM
         public override void InitScenario()
         {
             base.InitScenario();
+            scenarioInfo = "Tutorial scenario\nYour task is to first destroy the four crystals and then the following Minions.";
+            winText = "You successfully defeated all minions good job!";
+            loseText = "Oh no you lost, better luck next time!";
             foreach (CrystalDestroyable crystal in Object.FindObjectsOfType<CrystalDestroyable>())
                 GameMaster.Instance.gearTracker.minionsList.Add(crystal);
         }
@@ -35,9 +38,9 @@ namespace MvM
             base.Escalate();
         }
 
-        public override bool GameLost => base.GameLost;
+        public override bool IsGameLost => base.IsGameLost;
 
-        public override bool GameWon
+        public override bool IsGameWon
         {
             get
             {
@@ -49,7 +52,7 @@ namespace MvM
 
         public override void GenerateMap()
         {
-            Object.Instantiate(Resources.Load("Maps/Map_Scenario0"));
+            gameMap = Object.Instantiate(Resources.Load("Maps/Map_Scenario0"));
         }
 
         public override void CrystalDestroyed(CrystalDestroyable crystal)

@@ -6,6 +6,7 @@ namespace MvM
 {
     public class UIElement : MonoBehaviour
     {
+        [Header("UI Object references")]
         public UIHighlight highlight;
 
         public virtual void SetHighlightState(UIHighlight.HighlightState highlightState)

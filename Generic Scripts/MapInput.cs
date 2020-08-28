@@ -6,17 +6,25 @@ namespace MvM
 {
     public class MapInput : Singleton<MapInput>
     {
+        [System.Serializable]
+        public class MapSquareColors
+        {
+            public Color passiveColor;
+            public Color hoverColor;
+            public Color interactableColor;
+            public Color interactableHoveredColor;
+            public Color nonfinalColor;
+            public Color nonfinalHoveredColor;
+            public Color uninteractableColor;
+            public Color uninteractableHoveredColor;
+        }
+
         public Vector3 cameraBounds;
         public float cameraMoveMultiplier;
         public LayerMask raycastMask;
 
         [Header("Highlight colors")]
-        public Color passiveColor;
-        public Color hoverColor;
-        public Color interactableColor;
-        public Color interactableHoveredColor;
-        public Color uninteractableColor;
-        public Color uninteractableHoveredColor;
+        public MapSquareColors colors;
 
         private Ray ray;
         private RaycastHit hit;
@@ -72,7 +80,7 @@ namespace MvM
                 if (Input.GetButtonUp("Fire1"))
                 {
                     if (target &&
-                        target.interactable == MapSquare.Interactable.ActiveChoice &&
+                        (target.interactable == MapSquare.Interactable.ActiveChoice || target.interactable == MapSquare.Interactable.NonfinalChoice) &&
                         buttonHoldTime < mapMoveHoldTime &&
                         currentInputDelay > inputMinDelay)
                     {

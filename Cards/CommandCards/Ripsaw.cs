@@ -14,12 +14,18 @@ namespace MvM
             textureAsset = Resources.Load<Sprite>("CommandCardTextures/T_Ripsaw");
         }
 
+        public override void InitializeCardExecution(Unit executingUnit)
+        {
+            base.InitializeCardExecution(executingUnit);
+            cardState = CardState.NoInputRequired;
+        }
+
         public override void ExecuteCard()
         {
             List<Unit> targets = new List<Unit>();
             for (int i = 0; i < level; i++)
             {
-                MapSquare temp = startSquare.GetNeighbour(Tools.GetDirectionFromFacing(Tools.Facing.Forward, startFacing));
+                MapSquare temp = startSquare.GetNeighbour(Tools.GetDirectionFromFacing(Tools.Facing.Forward, startFacingDirection));
                 while (temp)
                 {
                     if (temp.unit && !targets.Contains(temp.unit))
@@ -31,7 +37,7 @@ namespace MvM
                         }
                         break;
                     }
-                    temp = temp.GetNeighbour(Tools.GetDirectionFromFacing(Tools.Facing.Forward, startFacing));
+                    temp = temp.GetNeighbour(Tools.GetDirectionFromFacing(Tools.Facing.Forward, startFacingDirection));
                 }
             }
 

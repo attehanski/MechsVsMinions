@@ -6,22 +6,30 @@ namespace MvM
 {
     public class TestScenario : Scenario
     {
-        public override bool GameWon
+        public override void InitScenario()
+        {
+            base.InitScenario();
+            scenarioInfo = "This scenario is for testing purposes.\nThe scenario will end when you have defeated 25 Minions.\nYou lose if you take more than 20 turns.";
+            winText = "You defeated enough minions!";
+            loseText = "Oh no you took too long to kill the minions, better luck next time!";
+        }
+
+        public override bool IsGameWon
         {
             get
             {
-                if (GameMaster.Instance.gearTracker.minionsKilled >= 7)
+                if (GameMaster.Instance.gearTracker.minionsKilled >= 25)
                     return true;
                 else
                     return false;
             }
         }
 
-        public override bool GameLost
+        public override bool IsGameLost
         {
             get
             {
-                if (GameMaster.Instance.turnNumber > 10)
+                if (GameMaster.Instance.turnNumber > 20)
                     return true;
                 else
                     return false;
@@ -30,7 +38,7 @@ namespace MvM
 
         public override void GenerateMap()
         {
-            Object.Instantiate(Resources.Load("Maps/Map_TestScenario"));
+            gameMap = Object.Instantiate(Resources.Load("Maps/Map_TestScenario"));
         }
     }
 }

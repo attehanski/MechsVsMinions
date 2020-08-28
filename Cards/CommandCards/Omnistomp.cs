@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace MvM
 {
-    public class Omnistomp : CommandCard
+    public class Omnistomp : BasicMoveCard
     {
-        private Tools.Direction moveDirection = Tools.Direction.None;
+        private Dictionary<MapSquare, Tools.Facing> inputOptionFacings = new Dictionary<MapSquare, Tools.Facing>();
 
         public Omnistomp()
         {
@@ -18,68 +18,32 @@ namespace MvM
 
         public override Dictionary<MapSquare, MapSquare.Interactable> GetValidInputSquares()
         {
-            inputSquares = new Dictionary<MapSquare, MapSquare.Interactable>();
+            inputSquares.Clear();
+            inputOptionFacings.Clear();
 
-            MapSquare temp = null;
-            MapSquare prev = null;
+            Tools.Facing[] possibleFacings;
+            if (doneMoves == 0)
+                possibleFacings = new Tools.Facing[] { Tools.Facing.Left, Tools.Facing.Right, Tools.Facing.Forward };
+            else
+                possibleFacings = new Tools.Facing[] { moveFacing };
 
-            foreach (Tools.Facing facing in new Tools.Facing[] { Tools.Facing.Left, Tools.Facing.Right, Tools.Facing.Forward })
+            foreach (Tools.Facing facing in possibleFacings)
             {
-                Tools.Direction moveDir = Tools.GetDirectionFromFacing(facing, startFacing);
-                temp = startSquare;
-                prev = null;
-
-                for (int i = 0; i < level; i++)
+                Tools.Direction moveDir = Tools.GetDirectionFromFacing(facing, startFacingDirection);
+                foreach (KeyValuePair<MapSquare, MapSquare.Interactable> kvp in GetInputsForOneDirection(moveDir))
                 {
-                    temp = temp.GetNeighbour(moveDir);
-
-                    if (!temp.CanEnterSquare(GameMaster.Instance.currentPlayer.character, moveDir))
-                    {
-                        if (prev)
-                            inputSquares[prev] = MapSquare.Interactable.ActiveChoice;
-                        else
-                            inputSquares.Add(temp, MapSquare.Interactable.ActiveChoice);
-                        break;
-                    }
-
-                    if (i < level - 1)
-                        inputSquares.Add(temp, MapSquare.Interactable.InactiveChoice);
-                    else
-                        inputSquares.Add(temp, MapSquare.Interactable.ActiveChoice);
-
-                    prev = temp;
+                    inputSquares.Add(kvp.Key, kvp.Value);
+                    inputOptionFacings.Add(kvp.Key, facing);
                 }
             }
 
             return inputSquares;
         }
 
-        public override void Input(MapSquare squareInput)
+        public override void Input(MapSquare inputSquare)
         {
-            moveDirection = Tools.GetDirection(startSquare, squareInput);
-            inputReceived = true;
-        }
-
-        public override void UpdateCardState()
-        {
-            if (inputReceived)
-                readyToExecute = true;
-        }
-
-        public override void ExecuteCard()
-        {
-            // If no available moves, return
-            if (moveDirection == Tools.Direction.None)
-                return;
-
-            MapSquare temp = startSquare.GetNeighbour(moveDirection);
-
-            for (int i = 1; i <= level; i++)
-            {
-                unit.Move(moveDirection);
-            }
-
-            base.ExecuteCard();
+            moveFacing = inputOptionFacings[inputSquare];
+            base.Input(inputSquare);
         }
     }
 }

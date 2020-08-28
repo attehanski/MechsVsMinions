@@ -19,17 +19,24 @@ namespace MvM
 
         public override void ExecuteCard()
         {
+            Debug.Log("Execute Stuck Controls!");
             if (isMove)
                 GameMaster.Instance.currentPlayer.character.Move(direction);
             else
                 GameMaster.Instance.currentPlayer.character.Turn(direction);
 
             GameMaster.Instance.currentPlayer.character.ExecuteActions();
+            base.ExecuteCard();
         }
 
         public override string ToString()
         {
             return "Damage: Stuck Controls " + (isMove ? "Move " : "Turn ") + direction;
+        }
+
+        public override void InitializeCardExecution(Unit unit)
+        {
+            base.InitializeCardExecution(unit);
         }
     }
 }

@@ -58,7 +58,6 @@ namespace MvM
                 minionsList.Remove(minion);
                 minionsKilled++;
             }
-
         }
 
         #region Variables
@@ -72,7 +71,7 @@ namespace MvM
         public Scenario scenario;
         public Player currentPlayer;
         public Card cardBeingExecuted;
-        public CardStack<CommandCard> commmandCardDeck = new CardStack<CommandCard>();
+        public CardStack<CommandCard> commandCardDeck = new CardStack<CommandCard>();
         public CardStack<CommandCard> commandCardDiscard = new CardStack<CommandCard>();
         public CardStack<DamageCard> damageCardDeck = new CardStack<DamageCard>();
         public CardStack<DamageCard> damageCardDiscard = new CardStack<DamageCard>();
@@ -89,6 +88,7 @@ namespace MvM
 
         private bool gameStarted = false;
         private bool interactableSquaresMarked = false;
+        private Coroutine commandlineExecutionRoutine;
         #endregion
 
         #region Main Menu and initialization
@@ -96,6 +96,11 @@ namespace MvM
         private void Start()
         {
             gearTracker.InitRunes();
+        }
+
+        public void QuitGame()
+        {
+            Application.Quit();
         }
 
         private void InitPlayers()
@@ -114,24 +119,24 @@ namespace MvM
             for (int i = 0; i < 8; i++)
             {
                 // Turn cards
-                commmandCardDeck.AddTop(new FuelTank());
-                commmandCardDeck.AddTop(new Scythe());
-                commmandCardDeck.AddTop(new MemoryCore());
-                commmandCardDeck.AddTop(new Cyclotron());
+                commandCardDeck.AddTop(new FuelTank());
+                commandCardDeck.AddTop(new Scythe());
+                commandCardDeck.AddTop(new MemoryCore());
+                commandCardDeck.AddTop(new Cyclotron());
 
                 // Move cards
-                commmandCardDeck.AddTop(new Blaze());
-                commmandCardDeck.AddTop(new Skewer());
-                commmandCardDeck.AddTop(new Omnistomp());
-                commmandCardDeck.AddTop(new Speed());
+                commandCardDeck.AddTop(new Blaze());
+                commandCardDeck.AddTop(new Skewer());
+                commandCardDeck.AddTop(new Omnistomp());
+                commandCardDeck.AddTop(new Speed());
 
                 // Attack cards
-                commmandCardDeck.AddTop(new Flamespitter());
-                commmandCardDeck.AddTop(new Ripsaw());
-                commmandCardDeck.AddTop(new HexmaticAimbot());
-                commmandCardDeck.AddTop(new ChainLightning());
+                commandCardDeck.AddTop(new Flamespitter());
+                commandCardDeck.AddTop(new Ripsaw());
+                commandCardDeck.AddTop(new HexmaticAimbot());
+                commandCardDeck.AddTop(new ChainLightning());
             }
-            commmandCardDeck = ShuffleDeck(commmandCardDeck);
+            commandCardDeck = ShuffleDeck(commandCardDeck);
             #endregion
 
             #region Initialize Damage Card Deck
@@ -157,9 +162,9 @@ namespace MvM
                 damageCardDeck.AddTop(new StuckControls(Tools.Facing.Back, false));
             }
             // if (unlockedForScenario)
-            damageCardDeck.AddTop(new CatastrophicFailure());
+            //damageCardDeck.AddTop(new RocketWhoopsie());
+            //damageCardDeck.AddTop(new CatastrophicFailure());
             //damageCardDeck.AddTop(new BeamMisfire());
-
 
             damageCardDeck = ShuffleDeck(damageCardDeck);
             #endregion
@@ -185,6 +190,16 @@ namespace MvM
             #endregion
         }
 
+        public void ResetDecks()
+        {
+            commandCardDeck.Clear();
+            commandCardDiscard.Clear();
+            damageCardDeck.Clear();
+            damageCardDiscard.Clear();
+            //bossCardDeck.Clear();
+            //bossCardDiscard.Clear();
+        }
+
         public void SetScenario(Scenario newScenario)
         {
             scenario = newScenario;
@@ -200,8 +215,29 @@ namespace MvM
             UIMaster.Instance.ShowInGamePanel();
             UIMaster.Instance.ShowScenarioRules(scenario);
             gameStarted = true;
+            turnNumber = 1;
 
             currentTurnState.StartState();
+        }
+
+        public void EndGame()
+        {
+            StopAllCoroutines();
+            //if (commandlineExecutionRoutine != null)
+            //    StopCoroutine(commandlineExecutionRoutine);
+            foreach (Unit unit in FindObjectsOfType<Unit>())
+                Destroy(unit.gameObject);
+            gearTracker.minionsKilled = 0;
+            gearTracker.minionsList.Clear();
+
+            scenario.RemoveMap();
+            scenario = null;
+            currentTurnState = null;
+            ResetDecks();
+            foreach (Player player in players)
+                player.ResetPlayer();
+            players.Clear();
+            gameStarted = false;
         }
         #endregion
 
@@ -213,9 +249,9 @@ namespace MvM
             if (gameStarted)
             {
                 // First check if game has been won or lost, prioritizing win
-                if (scenario.GameWon)
+                if (scenario.IsGameWon)
                     currentTurnState = new TurnState_EndGame(true);
-                else if (scenario.GameLost)
+                else if (scenario.IsGameLost)
                     currentTurnState = new TurnState_EndGame(false);
 
                 // If all players are done, inform the state
@@ -240,7 +276,7 @@ namespace MvM
         #region Command Line functionality
         public void ExecuteAllCommandLines()
         {
-            StartCoroutine(DoExecuteAllCommandLines());
+            commandlineExecutionRoutine = StartCoroutine(DoExecuteAllCommandLines());
         }
 
         private IEnumerator DoExecuteAllCommandLines()
@@ -249,8 +285,8 @@ namespace MvM
             foreach (Player player in players)
             {
                 currentPlayer = player;
-                ExecuteCurrentCommandLine();
-                while (!commandLineFinished)
+                ExecuteCurrentCommandLine(player);
+                while (!player.commandLine.commandLineFinished)
                     yield return null;
 
                 UIMaster.Instance.UpdateMultiButtonState(UIMultiButton.MultiButtonState.Ready);
@@ -269,74 +305,9 @@ namespace MvM
             currentTurnState.AdvanceState();
         }
 
-        public void ExecuteCurrentCommandLine()
+        public void ExecuteCurrentCommandLine(Player player)
         {
-            StartCoroutine(DoExecuteCurrentCommandLine());
-        }
-
-        private IEnumerator DoExecuteCurrentCommandLine(bool reverseOrder = false)
-        {
-            commandLineFinished = false;
-
-            //yield return new WaitForSeconds(Settings.commandExecutionDelay);
-
-            currentPlayer.character.ToggleHighlight(true);
-            int end = reverseOrder ? -1 : 6;
-            for (int i = reverseOrder ? 5 : 0; (!reverseOrder && i < end) || (reverseOrder && i > end); i = reverseOrder ? i - 1 : i + 1)
-            {
-                interactableSquaresMarked = false;
-                interactedSquare = null;
-
-                cardBeingExecuted = currentPlayer.commandLine.GetTopCard(i);
-                if (cardBeingExecuted != null)
-                {
-                    UIMaster.Instance.cardSlots[i].SetHighlightState(UIHighlight.HighlightState.Available);
-                    cardBeingExecuted.InitializeCardExecution(currentPlayer.character); // NOTE: hardcoded for players, requires recoding if used for other units!
-
-                    // If no input is required, skip straight to execution
-                    if (cardBeingExecuted.inputRequired)
-                    {
-                        // While card is not ready to execute, update it and wait for input
-                        while (!cardBeingExecuted.readyToExecute)
-                        {
-                            // Mark interactable squares for the player
-                            if (!interactableSquaresMarked)
-                            {
-                                Dictionary<MapSquare, MapSquare.Interactable> inputSquares = cardBeingExecuted.GetValidInputSquares();
-                                // Failsafe
-                                if (!inputSquares.Values.Contains(MapSquare.Interactable.ActiveChoice))
-                                    cardBeingExecuted.NoViableInputOptions();
-                                else
-                                    MapInput.Instance.SetInteractables(inputSquares);
-
-                                interactableSquaresMarked = true;
-                            }
-
-                            // If we have received input, handle input to the card
-                            if (!cardBeingExecuted.inputReceived && interactedSquare)
-                            {
-                                MapInput.Instance.ClearInteractables();
-                                cardBeingExecuted.Input(interactedSquare);
-                                interactableSquaresMarked = false;
-                                interactedSquare = null;
-                            }
-                            cardBeingExecuted.UpdateCardState();
-                            yield return null;
-                        }
-                    }
-                    cardBeingExecuted.ExecuteCard();
-                    yield return new WaitForSeconds(Settings.commandExecutionDelay);
-                    while (currentPlayer.character.actionsInProgress)
-                        yield return null;
-                    UIMaster.Instance.cardSlots[i].SetHighlightState(UIHighlight.HighlightState.Inactive);
-                }
-                else
-                    yield return null;
-                cardBeingExecuted = null;
-            }
-            commandLineFinished = true;
-            currentPlayer.character.ToggleHighlight(false);
-            yield return null;
+            StartCoroutine(player.commandLine.ExecuteCurrentCommandLine(player));
         }
 
         public void RepairCommandSlot(Player player, int slotIndex)
@@ -435,9 +406,9 @@ namespace MvM
             switch (type)
             {
                 case Card.Type.Command:
-                    if (commmandCardDeck.Count < 1)
-                        (commmandCardDeck, commandCardDiscard) = ResetDeck(commmandCardDeck, commandCardDiscard);
-                    drawnCard = commmandCardDeck.PopTop();
+                    if (commandCardDeck.Count < 1)
+                        (commandCardDeck, commandCardDiscard) = ResetDeck(commandCardDeck, commandCardDiscard);
+                    drawnCard = commandCardDeck.PopTop();
                     break;
 
                 case Card.Type.Damage:

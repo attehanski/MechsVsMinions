@@ -10,9 +10,9 @@ namespace MvM
         {
             stateName = "EndGame";
             if (gameWon)
-                Debug.Log("YOU WON THE GAME!");
+                GameMaster.Instance.scenario.GameWon();
             else
-                Debug.Log("YOU LOST THE GAME! :(");
+                GameMaster.Instance.scenario.GameLost();
         }
     }
 }

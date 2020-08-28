@@ -36,35 +36,36 @@ namespace MvM
             character = GameMaster.Instance.localPlayer.character;
             currentCard = GameMaster.Instance.localPlayer.currentCard;
             ready = GameMaster.Instance.localPlayer.ready;
-            deck = GameMaster.Instance.commmandCardDeck.ToArray();
+            deck = GameMaster.Instance.commandCardDeck.ToArray();
             discard = GameMaster.Instance.commandCardDiscard.ToArray();
             damageDeck = GameMaster.Instance.damageCardDeck.ToArray();
             damageDiscard = GameMaster.Instance.damageCardDiscard.ToArray();
-            
-            for (int i = 0; i < 6; i++)
-            {
-                switch (i)
+
+            if (GameMaster.Instance.localPlayer.commandLine != null)
+                for (int i = 0; i < 6; i++)
                 {
-                    case 0:
-                        cmdLine.slot1 = GameMaster.Instance.localPlayer.commandLine.cards[i].ToArray();
-                        break;
-                    case 1:
-                        cmdLine.slot2 = GameMaster.Instance.localPlayer.commandLine.cards[i].ToArray();
-                        break;
-                    case 2:
-                        cmdLine.slot3 = GameMaster.Instance.localPlayer.commandLine.cards[i].ToArray();
-                        break;
-                    case 3:
-                        cmdLine.slot4 = GameMaster.Instance.localPlayer.commandLine.cards[i].ToArray();
-                        break;
-                    case 4:
-                        cmdLine.slot5 = GameMaster.Instance.localPlayer.commandLine.cards[i].ToArray();
-                        break;
-                    case 5:
-                        cmdLine.slot6 = GameMaster.Instance.localPlayer.commandLine.cards[i].ToArray();
-                        break;
+                    switch (i)
+                    {
+                        case 0:
+                            cmdLine.slot1 = GameMaster.Instance.localPlayer.commandLine.cards[i].ToArray();
+                            break;
+                        case 1:
+                            cmdLine.slot2 = GameMaster.Instance.localPlayer.commandLine.cards[i].ToArray();
+                            break;
+                        case 2:
+                            cmdLine.slot3 = GameMaster.Instance.localPlayer.commandLine.cards[i].ToArray();
+                            break;
+                        case 3:
+                            cmdLine.slot4 = GameMaster.Instance.localPlayer.commandLine.cards[i].ToArray();
+                            break;
+                        case 4:
+                            cmdLine.slot5 = GameMaster.Instance.localPlayer.commandLine.cards[i].ToArray();
+                            break;
+                        case 5:
+                            cmdLine.slot6 = GameMaster.Instance.localPlayer.commandLine.cards[i].ToArray();
+                            break;
+                    }
                 }
-            }
         }
     }
 }

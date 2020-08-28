@@ -24,6 +24,7 @@ namespace MvM
                         temp.unit.TakeDamage();
                 }
             }
+            base.ExecuteCard();
         }
 
         public override string ToString()

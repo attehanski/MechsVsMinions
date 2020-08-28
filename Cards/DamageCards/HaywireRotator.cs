@@ -18,6 +18,7 @@ namespace MvM
             damageDir = GameMaster.Instance.GetRandomDirection();
             GameMaster.Instance.currentPlayer.character.Turn(damageDir);
             GameMaster.Instance.currentPlayer.character.ExecuteActions();
+            base.ExecuteCard();
         }
 
         public override string ToString()

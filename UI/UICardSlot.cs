@@ -39,10 +39,7 @@ namespace MvM
 
         public void UpdateSlotElements()
         {
-            // Destroy old cards, if any
-            foreach (GameObject card in slotCards)
-                Destroy(card);
-            slotCards.Clear();
+            ClearCards();
             int i = 0;
 
             // Generate new cards
@@ -51,6 +48,20 @@ namespace MvM
                 GenerateUICard(card, i);
                 i++;
             }
+        }
+
+        public void ClearCards()
+        {
+            Debug.Log(slotCards.Count);
+            for (int i = (slotCards.Count - 1); i >= 0; i--)
+            {
+                Debug.Log("Clearing card " + i);
+                Destroy(slotCards[i]);
+                slotCards.RemoveAt(i);
+            }
+            //foreach (GameObject card in slotCards)
+            //    Destroy(card);
+            //slotCards.Clear();
         }
     }
 }

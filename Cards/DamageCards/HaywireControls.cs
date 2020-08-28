@@ -21,6 +21,7 @@ namespace MvM
                 GameMaster.Instance.currentPlayer.character.Move(damageDir);
             }
             GameMaster.Instance.currentPlayer.character.ExecuteActions();
+            base.ExecuteCard();
         }
 
         public override string ToString()

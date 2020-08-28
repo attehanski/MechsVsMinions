@@ -52,5 +52,15 @@ namespace MvM
             foreach (UIHandCard card in cards)
                 card.button.interactable = !locked;
         }
+
+        public void ClearHand()
+        {
+            int lastIndex = cards.Count - 1;
+            for (int i = 0; i < cards.Count; i++)
+            {
+                Destroy(cards[lastIndex - i].gameObject);
+            }
+            cards.Clear();
+        }
     }
 }

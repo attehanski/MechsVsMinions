@@ -18,7 +18,7 @@ namespace MvM
 
         public override void ExecuteCard()
         {
-
+            
         }
 
         public virtual void SlotDamageCard()

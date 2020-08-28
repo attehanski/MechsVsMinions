@@ -21,6 +21,7 @@ namespace MvM
             GameMaster.Instance.currentPlayer.character.Turn(Tools.Facing.Back);
 
             GameMaster.Instance.currentPlayer.character.ExecuteActions();
+            base.ExecuteCard();
         }
 
         public override string ToString()

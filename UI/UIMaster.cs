@@ -21,7 +21,7 @@ namespace MvM
         public UIState state;
 
         [Header("Main menu references")]
-        public GameObject mainMenuPanel;
+        public UIMainMenuPanel mainMenuPanel;
 
         [Header("During-game references")]
         public GameObject inGame;
@@ -32,6 +32,10 @@ namespace MvM
         public UICardSlot[] cardSlots;
         public GameObject continueButton;
         public UIMultiButton multiButton;
+
+        [Header("Panels")]
+        public UIWinLosePanel winLostPanel;
+        public UIScenarioInfoPanel scenarioInfoPanel;
 
         private Coroutine playerDamageAnimation;
         private UICardSlot selectedSwapItem;
@@ -46,12 +50,28 @@ namespace MvM
         {
             commandLine.SetActive(false);
             draftPanel.HideDraftPanel();
-            mainMenuPanel.SetActive(false);
+            mainMenuPanel.gameObject.SetActive(false);
         }
 
         public void ShowInGamePanel()
         {
             inGame.SetActive(true);
+        }
+
+        public void EndGame()
+        {
+            mainMenuPanel.gameObject.SetActive(true);
+            inGame.SetActive(false);
+            mainMenuPanel.scenarioSelection.value = 0;
+            draftPanel.ClearDraftPanel();
+            handPanel.ClearHand();
+            handPanel.Hide();
+            foreach (UICardSlot slot in cardSlots)
+            {
+                slot.SetHighlightState(UIHighlight.HighlightState.Inactive);
+                slot.ClearCards();
+            }
+            winLostPanel.Hide();
         }
         #endregion
 
@@ -65,7 +85,12 @@ namespace MvM
 
         public void ShowScenarioRules(Scenario scenario)
         {
-            //EnableContinueButton();
+            scenarioInfoPanel.ShowScenarioInfo(scenario.scenarioInfo);
+        }
+
+        public void ShowWinLostPanel(string winLoseInfo)
+        {
+            winLostPanel.ShowWinLosePanel(winLoseInfo);
         }
 
         public void ChangeTurnState(string state)

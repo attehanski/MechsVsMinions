@@ -8,6 +8,10 @@ namespace MvM
     public abstract class Scenario
     {
         public int escalationLevel = 0;
+        public Object gameMap;
+        public string scenarioInfo;
+        public string winText;
+        public string loseText;
 
         public virtual void InitScenario()
         {
@@ -24,13 +28,23 @@ namespace MvM
             escalationLevel++;
         }
 
-        public virtual bool GameWon
+        public virtual void GameWon()
+        {
+            UIMaster.Instance.ShowWinLostPanel(winText);
+        }
+
+        public virtual void GameLost()
+        {
+            UIMaster.Instance.ShowWinLostPanel(loseText);
+        }
+
+        public virtual bool IsGameWon
         {
             // Win condition code here
             get { return false; }
         }
 
-        public virtual bool GameLost
+        public virtual bool IsGameLost
         {
             // Lose condition code here
             get { return false; }
@@ -40,6 +54,12 @@ namespace MvM
         {
             // Instantiate correct map from Resources
             // NOTE: Could also use Prefabs for this
+        }
+
+        public virtual void RemoveMap()
+        {
+            if (gameMap)
+                Object.Destroy(gameMap);
         }
 
         public virtual void CrystalDestroyed(CrystalDestroyable crystal)

@@ -17,19 +17,26 @@ namespace MvM
             textureAsset = Resources.Load<Sprite>("CommandCardTextures/T_ChainLightning");
         }
 
+        public override void InitializeCardExecution(Unit executingUnit)
+        {
+            base.InitializeCardExecution(executingUnit);
+            targets.Clear();
+            allTargetsChosen = false;
+        }
+
         public override Dictionary<MapSquare, MapSquare.Interactable> GetValidInputSquares()
         {
             Dictionary<MapSquare, MapSquare.Interactable> inputSquares = new Dictionary<MapSquare, MapSquare.Interactable>();
 
             if (targets.Count == 0)
             {
-                MapSquare frontSquare = startSquare.GetNeighbour(Tools.GetDirectionFromFacing(Tools.Facing.Forward, startFacing));
+                MapSquare frontSquare = startSquare.GetNeighbour(Tools.GetDirectionFromFacing(Tools.Facing.Forward, startFacingDirection));
                 KeyValuePair<MapSquare, MapSquare.Interactable> temp;
                 temp = GetInteractable(frontSquare);
                 inputSquares.Add(temp.Key, temp.Value);
-                temp = GetInteractable(frontSquare.GetNeighbour(Tools.GetDirectionFromFacing(Tools.Facing.Left, startFacing)));
+                temp = GetInteractable(frontSquare.GetNeighbour(Tools.GetDirectionFromFacing(Tools.Facing.Left, startFacingDirection)));
                 inputSquares.Add(temp.Key, temp.Value);
-                temp = GetInteractable(frontSquare.GetNeighbour(Tools.GetDirectionFromFacing(Tools.Facing.Right, startFacing)));
+                temp = GetInteractable(frontSquare.GetNeighbour(Tools.GetDirectionFromFacing(Tools.Facing.Right, startFacingDirection)));
                 inputSquares.Add(temp.Key, temp.Value);
             }
             else
@@ -62,24 +69,22 @@ namespace MvM
                 if (targets.Count >= level * 2)
                 {
                     allTargetsChosen = true;
-                    inputReceived = true;
                     return;
                 }
             }
-
-            inputReceived = false;
+            
         }
 
         public override void UpdateCardState()
         {
             if (allTargetsChosen)
-                readyToExecute = true;
+            {
+                cardState = CardState.Finished;
+            }
         }
 
         public override void ExecuteCard()
         {
-            targets.Clear();
-            allTargetsChosen = false;
             base.ExecuteCard();
         }
 

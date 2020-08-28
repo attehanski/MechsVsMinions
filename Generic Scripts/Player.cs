@@ -20,6 +20,15 @@ namespace MvM
             commandLine = new CommandLine();
         }
 
+        public void ResetPlayer()
+        {
+            Debug.Log("ResetPlayer!");
+            currentCard = null;
+            hand.Clear();
+            character = null;
+            commandLine = null;
+        }
+
         public void SpawnChampion(MapSquare square, Tools.Direction facing)
         {
             character = GameMaster.Instance.SpawnUnit(Prefabs.Instance.genericChampion, square) as Champion;

@@ -24,6 +24,7 @@ namespace MvM
             cmdLine.cards[slot2] = temp;
 
             UIMaster.Instance.UpdateCommandLine();
+            base.ExecuteCard();
         }
 
         public override string ToString()

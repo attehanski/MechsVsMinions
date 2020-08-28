@@ -15,6 +15,7 @@ namespace MvM
         {
             GameMaster.Instance.currentPlayer.character.TakeDamage();
             GameMaster.Instance.currentPlayer.character.TakeDamage();
+            base.ExecuteCard();
         }
 
         public override string ToString()
