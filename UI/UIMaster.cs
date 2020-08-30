@@ -45,6 +45,22 @@ namespace MvM
             inGame.SetActive(false);
         }
 
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.Mouse1))
+            {
+                LayerMask raycastMask = 1;
+                RaycastHit hit;
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                Physics.Raycast(ray, out hit, 500f, raycastMask);
+            }
+
+            if (Input.GetKeyUp(KeyCode.Mouse2))
+            {
+
+            }
+        }
+
         #region MainMenu and Initialization
         public void StartGame()
         {
@@ -63,8 +79,8 @@ namespace MvM
             mainMenuPanel.gameObject.SetActive(true);
             inGame.SetActive(false);
             mainMenuPanel.scenarioSelection.value = 0;
-            draftPanel.ClearDraftPanel();
-            handPanel.ClearHand();
+            draftPanel.ClearCards();
+            handPanel.ClearCards();
             handPanel.Hide();
             foreach (UICardSlot slot in cardSlots)
             {
@@ -96,13 +112,6 @@ namespace MvM
         public void ChangeTurnState(string state)
         {
             turnState.GetComponentInChildren<Text>().text = state;
-        }
-
-        // NOTE: Change so this is done for player specific commandlines, not only local.
-        public void UpdateCommandLine()
-        {
-            foreach (UICardSlot slot in cardSlots)
-                slot.UpdateSlotElements();
         }
 
         public bool PlayerDamageAnimationRunning()
@@ -162,6 +171,14 @@ namespace MvM
         {
             selectedSwapItem = slot;
             slot.SetHighlightState(UIHighlight.HighlightState.Selected);
+        }
+
+        public static UICard InstantiateCard(Card card, Transform parent)
+        {
+            UICard UICard = Instantiate(Prefabs.Instance.card, parent).GetComponent<UICard>();
+            UICard.InitCard(card);
+
+            return UICard;
         }
         #endregion
     }

@@ -20,8 +20,9 @@ namespace MvM
         private Button button;
         private Text text;
 
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             button = GetComponent<Button>();
             text = GetComponentInChildren<Text>();
         }
@@ -60,7 +61,7 @@ namespace MvM
             switch (state)
             {
                 case MultiButtonState.Ready:
-                    GameMaster.Instance.SetLocalPlayerReady(true);
+                    GameMaster.Instance.currentPlayer.ready = true;
                     ChangeState(MultiButtonState.Inactive);
                     break;
 

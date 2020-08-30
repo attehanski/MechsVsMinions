@@ -19,7 +19,9 @@ namespace MvM
         {
             base.StartState();
             DrawDraftCards(5);
-            UIMaster.Instance.draftPanel.OpenDraftPanel();
+
+            // UI
+            UIMaster.Instance.draftPanel.OpenDraftPanel(draftCards);
             UIMaster.Instance.commandLine.SetActive(true);
             UIMaster.Instance.UpdateMultiButtonState(UIMultiButton.MultiButtonState.Inactive);
         }
@@ -35,29 +37,23 @@ namespace MvM
 
         public override void UpdateState()
         {
-            // If its our turn, update state
-            if (GameMaster.Instance.currentPlayer == GameMaster.Instance.localPlayer)
+            // If all players are ready, move onwards
+            if (GameMaster.Instance.GetAllPlayersReady())
             {
-                // If all players are ready, move onwards
-                if (GameMaster.Instance.GetAllPlayersReady())
-                {
-                    
-                }
-                // Else if current player has picked a card, move to next player
-                else if (GameMaster.Instance.currentPlayer.ready)
-                {
-                    GameMaster.Instance.NextPlayer();
-                }
-            }
-            else
-                UIMaster.Instance.UpdateMultiButtonState(UIMultiButton.MultiButtonState.Inactive);
-            base.UpdateState();
 
+            }
+            // Else if current player has picked a card, move to next player
+            else if (GameMaster.Instance.currentPlayer.ready)
+            {
+                GameMaster.Instance.NextPlayer();
+            }
+            base.UpdateState();
         }
 
         // TODO: Add functionality to add cards to the amount based on extra variables (Memory Core cards)
         public void DrawDraftCards(int amount)
         {
+            draftCards.Clear(); // NOTE: Check if this is necessary
             for (int i = 0; i < amount; i++)
             {
                 draftCards.Add(GameMaster.Instance.DrawCard(Card.Type.Command) as CommandCard);
@@ -85,6 +81,19 @@ namespace MvM
                 draftStage = 1;
                 GameMaster.Instance.UpdateUIState();
             }
+        }
+
+        public virtual void CardPicked(CommandCard card)
+        {
+            draftCards.Remove(card);
+            GameMaster.Instance.currentPlayer.hand.Add(card);
+            SetCurrentCard(card);
+            GameMaster.Instance.currentPlayer.ready = true;
+        }
+
+        public void SetCurrentCard(CommandCard card)
+        {
+            GameMaster.Instance.currentPlayer.currentCard = card;
         }
 
         public virtual void CardSlotted()

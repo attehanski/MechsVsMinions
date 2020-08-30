@@ -77,9 +77,7 @@ namespace MvM
         public CardStack<DamageCard> damageCardDiscard = new CardStack<DamageCard>();
         //public CardStack<BossCard> bossCardDeck = new CardStack<BossCard>();
         //public CardStack<BossCard> bossCardDiscard = new CardStack<BossCard>();
-
-        [HideInInspector]
-        public Player localPlayer; // NOTE: For hot seat games, all players are local players. Code should reflect this.
+        
         [HideInInspector]
         public MapSquare interactedSquare;
 
@@ -109,7 +107,6 @@ namespace MvM
             Player player = new Player("Player");
 
             players.Add(player);
-            localPlayer = player;
             currentPlayer = player;
         }
 
@@ -317,7 +314,7 @@ namespace MvM
 
             // NOTE: Not sure about this being in here, data and UI should be separated more efficiently
             // UI handling
-            UIMaster.Instance.cardSlots[slotIndex].UpdateSlotElements();
+            UIMaster.Instance.cardSlots[slotIndex].RepairSlot();
         }
 
         public void SwapSlots(Player player, int slotIndex1, int slotIndex2)
@@ -328,8 +325,7 @@ namespace MvM
             player.commandLine.cards[slotIndex2] = tempStack;
 
             // UI handling
-            UIMaster.Instance.cardSlots[slotIndex1].UpdateSlotElements();
-            UIMaster.Instance.cardSlots[slotIndex2].UpdateSlotElements();
+            UIMaster.Instance.cardSlots[slotIndex1].SwapCards(UIMaster.Instance.cardSlots[slotIndex2]);
         }
         #endregion
 
@@ -358,11 +354,6 @@ namespace MvM
         {
             foreach (Player player in players)
                 player.ready = readyState;
-        }
-
-        public void SetLocalPlayerReady(bool ready)
-        {
-            localPlayer.ready = ready;
         }
 
         #region Deck & Discard handling
@@ -509,7 +500,6 @@ namespace MvM
             for (int i = 0; i < damageAmount; i++)
             {
                 player.character.TakeDamage(Tools.Color.None);
-                UIMaster.Instance.UpdateCommandLine();          // NOTE: Change to only update the correct player command line
                 yield return new WaitForSeconds(1f);
             }
             player.ready = true; // NOTE: Change to rotate current player
@@ -553,7 +543,7 @@ namespace MvM
 
                 //if ((UIMaster.Instance.state == UIMaster.UIState.ScrapRepair || UIMaster.Instance.state == UIMaster.UIState.ScrapSwap))
                 //{
-                //    //if (localPlayer.hand.Count > 0)
+                //    //if (currentPlayer.hand.Count > 0)
                 //    UIMaster.Instance.state = UIMaster.UIState.Slot;
                 //    //else
                 //    //    UIMaster.Instance.state = UIMaster.UIState.Wait;
@@ -563,54 +553,53 @@ namespace MvM
                 UIMaster.Instance.state = UIMaster.UIState.CmdLine;
             else if (currentTurnState is TurnState_PlayerSpawn)
                 UIMaster.Instance.state = UIMaster.UIState.PlayerSpawn;
-
-
         }
 
+        // TODO: Cut into smaller parts
         public void CardSlotInteracted(UICardSlot slot)
         {
             if (UIMaster.Instance.state == UIMaster.UIState.Slot)
             {
                 if ((currentTurnState as TurnState_Draft).draftStage > 0 &&
-                    localPlayer.currentCard != null &&
-                    localPlayer.commandLine.CanSlotCard(slot.index, localPlayer.currentCard))
+                    currentPlayer.currentCard != null &&
+                    currentPlayer.commandLine.CanSlotCard(slot.index, currentPlayer.currentCard))
                 {
-                    UIMaster.Instance.handPanel.RemoveCard(localPlayer.currentCard);
+                    currentPlayer.hand.Remove(currentPlayer.currentCard);
+                    currentPlayer.commandLine.SlotCard(slot.index, currentPlayer.currentCard);
+                    currentPlayer.currentCard = null;
 
-                    SlotCard(slot, localPlayer.currentCard);
-                    localPlayer.currentCard = null;
-
-                    UIMaster.Instance.draftPanel.CardSlotted();
+                    UIMaster.Instance.handPanel.SlotCurrentCard(slot);
+                    (currentTurnState as TurnState_Draft).CardSlotted();
                 }
             }
             else if (UIMaster.Instance.state == UIMaster.UIState.ScrapRepair)
             {
-                if (localPlayer.commandLine.cards[slot.index].Count > 0 &&
-                    localPlayer.commandLine.cards[slot.index].PeekTop() is DamageCard)
+                if (currentPlayer.commandLine.cards[slot.index].Count > 0 &&
+                    currentPlayer.commandLine.cards[slot.index].PeekTop() is DamageCard)
                 {
-                    RepairCommandSlot(localPlayer, slot.index);
-                    UIMaster.Instance.handPanel.RemoveCard(localPlayer.currentCard);
-                    DiscardCard(localPlayer.currentCard);
-                    UIMaster.Instance.ToggleRepairScrap(localPlayer, false);
-                    UIMaster.Instance.draftPanel.CardSlotted();
+                    RepairCommandSlot(currentPlayer, slot.index);
+                    UIMaster.Instance.handPanel.RemoveCard(currentPlayer.currentCard);
+                    DiscardCard(currentPlayer.currentCard);
+                    UIMaster.Instance.ToggleRepairScrap(currentPlayer, false);
+                    (currentTurnState as TurnState_Draft).CardSlotted();
                     UpdateUIState();
                 }
             }
             else if (UIMaster.Instance.state == UIMaster.UIState.ScrapSwap)
             {
-                if (localPlayer.commandLine.cards[slot.index].Count == 0 || !(localPlayer.commandLine.cards[slot.index].PeekTop() is DamageCard))
+                if (currentPlayer.commandLine.cards[slot.index].Count == 0 || !(currentPlayer.commandLine.cards[slot.index].PeekTop() is DamageCard))
                 {
                     UICardSlot slot1 = UIMaster.Instance.SelectedSwapItem;
                     if (slot1 == null)
                         UIMaster.Instance.SwapScrapInteraction(slot);
                     else if (slot1 != slot)
                     {
-                        SwapSlots(localPlayer, slot1.index, slot.index);
-                        UIMaster.Instance.handPanel.RemoveCard(localPlayer.currentCard);
-                        DiscardCard(localPlayer.currentCard);
+                        SwapSlots(currentPlayer, slot1.index, slot.index);
+                        UIMaster.Instance.handPanel.RemoveCard(currentPlayer.currentCard);
+                        DiscardCard(currentPlayer.currentCard);
                         UIMaster.Instance.SelectedSwapItem = null;
-                        UIMaster.Instance.ToggleSwapScrap(localPlayer, false);
-                        UIMaster.Instance.draftPanel.CardSlotted();
+                        UIMaster.Instance.ToggleSwapScrap(currentPlayer, false);
+                        (currentTurnState as TurnState_Draft).CardSlotted();
                         UpdateUIState();
                     }
                 }
@@ -620,18 +609,18 @@ namespace MvM
         public void SlotCard(UICardSlot slot, Card card)
         {
             // Data handling
-            localPlayer.commandLine.SlotCard(slot.index, card);
+            currentPlayer.commandLine.SlotCard(slot.index, card);
 
             // UI handling
-            slot.SlotCard(localPlayer.currentCard);
+            slot.SlotCard(card);
         }
 
         public void Scrap()
         {
-            if (localPlayer.currentCard == null)
+            if (currentPlayer.currentCard == null)
                 return;
 
-            Tools.Color scrapColor = (localPlayer.currentCard as CommandCard).cardColor;
+            Tools.Color scrapColor = (currentPlayer.currentCard as CommandCard).cardColor;
             if (scrapColor == Tools.Color.Red || scrapColor == Tools.Color.Blue)
             {
                 int damageOptions = 0;
@@ -639,11 +628,11 @@ namespace MvM
                 {
                     if (currentPlayer.commandLine.cards[i].Count > 0 && currentPlayer.commandLine.cards[i].PeekTop() is DamageCard)
                         damageOptions++;
-                        }
+                }
                 if (damageOptions > 0)
                 {
                     UIMaster.Instance.state = UIMaster.UIState.ScrapRepair;
-                    UIMaster.Instance.ToggleRepairScrap(localPlayer, true);
+                    UIMaster.Instance.ToggleRepairScrap(currentPlayer, true);
                 }
                 else
                 {
@@ -662,22 +651,21 @@ namespace MvM
                 if (unDamagedSlots > 0)
                 {
                     UIMaster.Instance.state = UIMaster.UIState.ScrapSwap;
-                    UIMaster.Instance.ToggleSwapScrap(localPlayer, true);
+                    UIMaster.Instance.ToggleSwapScrap(currentPlayer, true);
                 }
                 else
                 {
                     NoScrapEffect();
                 }
-
             }
         }
 
         private void NoScrapEffect()
         {
-            UIMaster.Instance.handPanel.RemoveCard(localPlayer.currentCard);
-            DiscardCard(localPlayer.currentCard);
-            UIMaster.Instance.ToggleRepairScrap(localPlayer, false);
-            UIMaster.Instance.draftPanel.CardSlotted();
+            UIMaster.Instance.handPanel.RemoveCard(currentPlayer.currentCard);
+            DiscardCard(currentPlayer.currentCard);
+            UIMaster.Instance.ToggleRepairScrap(currentPlayer, false);
+            (currentTurnState as TurnState_Draft).CardSlotted();
             UpdateUIState();
         }
 

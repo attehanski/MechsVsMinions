@@ -5,63 +5,87 @@ using UnityEngine.UI;
 
 namespace MvM
 {
-    public class UICardSlot : UIElement
+    public class UICardSlot : UICardPanel
     {
         public int index;
-        private List<GameObject> slotCards = new List<GameObject>();
 
-        public void OnCardSlotClicked()
+        public void CardSlotClicked()
         {
             GameMaster.Instance.CardSlotInteracted(this);
         }
 
+        public void SlotCard(UICard card)
+        {
+            // TODO: Move discarding check earlier in the slotting handling
+            if (cards.Count > 0)
+            {
+                if ((card.cardData as CommandCard).cardColor != (cards[cards.Count - 1].cardData as CommandCard).cardColor)
+                    ClearCards();
+                else if (cards.Count > 2)
+                    cards.Remove(cards[0]);
+            }
+            AddCard(card);
+        }
+
         public void SlotCard(Card card)
         {
-            UpdateSlotElements();
+            AddCard(UIMaster.InstantiateCard(card, rect));
         }
 
-        public void GenerateUICard(Card card, int index)
+        public void RepairSlot()
         {
-            GameObject tempCard = Instantiate(Prefabs.Instance.commandCard, transform.position + new Vector3(0f, 15 - 15 * index, 0f), Quaternion.identity, transform);
-
-            if (card.textureAsset != null)
-                tempCard.GetComponent<Image>().sprite = card.textureAsset;
-
-            if (card is DamageCard || card.textureAsset == null)
-                tempCard.GetComponentInChildren<Text>().text = card.text;
-
-            if (card is CommandCard)
-                tempCard.GetComponentInChildren<Text>().color = Tools.GetColor((card as CommandCard).cardColor);
-            else if (card is DamageCard)
-                tempCard.GetComponentInChildren<Text>().color = Color.black;
-            slotCards.Add(tempCard);
+            if (cards[cards.Count - 1].cardData.type == Card.Type.Damage)
+                RemoveCard(cards[cards.Count - 1]);
+            else
+                Debug.LogError("Attempted to repair an undamaged slot!");
+        }
+        
+        public override void CardClicked(UICard card)
+        {
+            CardSlotClicked();
+            Debug.Log("Slotted card clicked: " + card.cardData.text);
         }
 
-        public void UpdateSlotElements()
+        public override void AddCard(UICard card)
         {
-            ClearCards();
-            int i = 0;
-
-            // Generate new cards
-            foreach (Card card in GameMaster.Instance.localPlayer.commandLine.cards[index].Reversed)
+            foreach (UICard slottedCard in cards)
             {
-                GenerateUICard(card, i);
-                i++;
+                slottedCard.button.interactable = false;
+                slottedCard.canvas.sortingOrder = 1;
             }
+            base.AddCard(card);
+            card.SetHighlightState(UIHighlight.HighlightState.Inactive);
+            card.canvas.sortingOrder = 2;
         }
 
-        public void ClearCards()
+        public override void RemoveCard(UICard card)
         {
-            Debug.Log(slotCards.Count);
-            for (int i = (slotCards.Count - 1); i >= 0; i--)
+            base.RemoveCard(card);
+            Destroy(card.gameObject);
+        }
+
+        protected override void PlaceCard(UICard card)
+        {
+            card.rect.position = transform.position + new Vector3(0f, 15 - 15 * cards.IndexOf(card), 0f);
+        }
+
+        public void SwapCards(UICardSlot otherSlot)
+        {
+            List<UICard> temp = cards;
+            cards = otherSlot.cards;
+            otherSlot.cards = temp;
+
+            ReplaceCards();
+            otherSlot.ReplaceCards();
+        }
+
+        public void ReplaceCards()
+        {
+            foreach (UICard card in cards)
             {
-                Debug.Log("Clearing card " + i);
-                Destroy(slotCards[i]);
-                slotCards.RemoveAt(i);
+                PlaceCard(card);
+                card.SetParentPanel(this);
             }
-            //foreach (GameObject card in slotCards)
-            //    Destroy(card);
-            //slotCards.Clear();
         }
     }
 }

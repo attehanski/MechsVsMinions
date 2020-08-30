@@ -18,9 +18,10 @@ namespace MvM
         public GameObject greenDamageEffect;
 
         [Header("UI")]
+        public GameObject card;
         public GameObject commandCard;
         public GameObject draftCard;
-        public GameObject handCard; // NOTE: Not sure if this is the best way to differentiate different UI cards
+        public GameObject handCard;
 
         [Header("Other")]
         public GameObject borderSquare;

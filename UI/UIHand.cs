@@ -4,63 +4,78 @@ using UnityEngine;
 
 namespace MvM
 {
-    public class UIHand : UIElement
+    public class UIHand : UICardPanel
     {
-        public List<UIHandCard> cards = new List<UIHandCard>();
-
-        public void AddCard(Card card)
-        {
-            gameObject.SetActive(true);
-            UnHighlightCards();
-
-            float xPos = -30 + cards.Count * 30;
-            float yPos = -10;
-
-            UIHandCard handCard = Instantiate(Prefabs.Instance.handCard, transform.position + new Vector3(xPos, yPos, 0f), Quaternion.identity, transform).GetComponent<UIHandCard>();
-            handCard.InitCard(card);
-            cards.Add(handCard);
-            handCard.SelectChoice();
-        }
+        public UICard currentCard;
 
         public void RemoveCard(Card card)
         {
             for (int i = 0; i < cards.Count; i++)
             {
-                if (cards[i].draftCard == card)
+                if (cards[i].cardData == card)
                 {
                     Destroy(cards[i].gameObject);
                     cards.Remove(cards[i]);
-
-                    if (cards.Count > 0)
-                        cards[0].GetComponent<Canvas>().sortingOrder = 2;
-                    else
-                        gameObject.SetActive(false);
-
                     break;
                 }
             }
+
+            if (cards.Count > 0)
+                cards[0].canvas.sortingOrder = 2;
+            else
+                gameObject.SetActive(false);
         }
 
         public void UnHighlightCards()
         {
-            foreach (UIHandCard card in cards)
+            foreach (UICard card in cards)
+            {
                 card.SetHighlightState(UIHighlight.HighlightState.Inactive);
+                card.rect.position = new Vector3(card.rect.position.x, transform.position.y - 10f, 0f);
+            }
         }
 
         public void SetHandLocked(bool locked)
         {
-            foreach (UIHandCard card in cards)
+            foreach (UICard card in cards)
                 card.button.interactable = !locked;
         }
 
-        public void ClearHand()
+        public override void CardClicked(UICard card)
         {
-            int lastIndex = cards.Count - 1;
-            for (int i = 0; i < cards.Count; i++)
-            {
-                Destroy(cards[lastIndex - i].gameObject);
-            }
-            cards.Clear();
+            SelectCard(card);
+            (GameMaster.Instance.currentTurnState as TurnState_Draft).SetCurrentCard(card.cardData as CommandCard);
+        }
+
+        public void SlotCurrentCard(UICardSlot slot)
+        {
+            cards.Remove(currentCard);
+            slot.SlotCard(currentCard);
+            if (cards.Count < 1)
+                Hide();
+        }
+
+        public override void AddCard(UICard card)
+        {
+            gameObject.SetActive(true);
+            UnHighlightCards();
+            base.AddCard(card);
+            SelectCard(card);
+        }
+
+        protected override void PlaceCard(UICard card)
+        {
+            float xPos = -50 + cards.Count * 30;
+            float yPos = -10;
+            card.rect.position = transform.position + new Vector3(xPos, yPos, 0f);
+        }
+
+        private void SelectCard(UICard card)
+        {
+            UnHighlightCards();
+            card.SetHighlightState(UIHighlight.HighlightState.Available);
+            card.rect.position = new Vector3(card.rect.position.x, transform.position.y + 0f, 0f);
+            currentCard = card;
         }
     }
 }

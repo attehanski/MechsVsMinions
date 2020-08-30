@@ -18,12 +18,13 @@ namespace MvM
 
         public override void ExecuteCard()
         {
-            CommandLine cmdLine = GameMaster.Instance.currentPlayer.commandLine;
-            CardStack<Card> temp = cmdLine.cards[slot1];
-            cmdLine.cards[slot1] = cmdLine.cards[slot2];
-            cmdLine.cards[slot2] = temp;
+            GameMaster.Instance.SwapSlots(GameMaster.Instance.currentPlayer, slot1, slot2);
+            //CommandLine cmdLine = GameMaster.Instance.currentPlayer.commandLine;
+            //CardStack<Card> temp = cmdLine.cards[slot1];
+            //cmdLine.cards[slot1] = cmdLine.cards[slot2];
+            //cmdLine.cards[slot2] = temp;
 
-            UIMaster.Instance.UpdateCommandLine();
+            //UIMaster.Instance.UpdateCommandLine();
             base.ExecuteCard();
         }
 

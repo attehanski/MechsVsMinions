@@ -2,60 +2,94 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 namespace MvM
 {
-    public class UICard : UIElement
+    [RequireComponent(typeof(Button))]
+    public class UICard : UIElement, IPointerDownHandler, IPointerUpHandler
     {
         public Text text;
-        public Image BG;       
+        public Image BG;
+        [HideInInspector]
+        public Button button;
+        [HideInInspector]
+        public Canvas canvas;
 
         [Header("Data")]
-        public Card draftCard;
+        public Card cardData; // NOTE: This is not required in the UI code, just for testing purposes
 
-        private Button button;
+        private UICardPanel parentPanel;
+        private UICard cardCloseup;
 
-        public void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             button = GetComponent<Button>();
+            canvas = GetComponent<Canvas>();
         }
 
         public void InitCard(Card card)
         {
-            draftCard = card;
+            cardData = card;
             if (card.textureAsset != null)
                 BG.sprite = card.textureAsset;
 
             if (card is DamageCard || card.textureAsset == null)
-                text.text = draftCard.text;
+                text.text = cardData.text;
 
             if (card is CommandCard)
                 text.text = "";
         }
 
-        public virtual void SelectChoice()
+        public void CardClicked()
         {
-            //hand.UnHighlightCards();
-            //GameMaster.Instance.localPlayer.currentCard = draftCard;
-            //SetHighlightState(UIHighlight.HighlightState.Available);
+            if (parentPanel)
+                parentPanel.CardClicked(this);
         }
 
         public override void SetHighlightState(UIHighlight.HighlightState highlightState)
         {
             base.SetHighlightState(highlightState);
-            Canvas canvas = GetComponent<Canvas>();
             canvas.overrideSorting = true;
             if (highlightState == UIHighlight.HighlightState.Available)
-            {
-                //transform.position = new Vector3(transform.position.x, hand.transform.position.y + 20f, 0); // NOTE: This is not easily scalable to different resolutions
                 canvas.sortingOrder = 2;
-            }
             else
-            {
-                //transform.position = new Vector3(transform.position.x, hand.transform.position.y - 10f, 0); // NOTE: This is not easily scalable to different resolutions
                 canvas.sortingOrder = 1;
+        }
+
+        public void SetParentPanel(UICardPanel newParent)
+        {
+            parentPanel = newParent;
+            rect.parent = newParent.rect;
+        }
+
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            if (eventData.button == PointerEventData.InputButton.Right)
+            {
+                cardCloseup = CreateCloseup();
             }
         }
 
+        public void OnPointerUp(PointerEventData eventData)
+        {
+            if (eventData.button == PointerEventData.InputButton.Right)
+            {
+                if (cardCloseup)
+                    Destroy(cardCloseup.gameObject);
+            }
+        }
+
+        private UICard CreateCloseup()
+        {
+            UICard closeup = Instantiate(Prefabs.Instance.card, UIMaster.Instance.transform).GetComponent<UICard>();
+            closeup.InitCard(cardData);
+            closeup.rect.localScale *= 3;
+            closeup.rect.position = new Vector3(Screen.width / 2, Screen.height / 2, 0f);
+            closeup.canvas.sortingOrder = 4;
+            closeup.button.interactable = false;
+            return closeup;
+        }
     }
 }

@@ -24,19 +24,16 @@ namespace MvM
             // If for some reason trying to slot a card out of the command line, return
             if (index < 0 || index >= cards.Length)
                 return false;
-
-            bool success = false;
+            
             if (card is CommandCard)
-                success = SlotCommandCard(index, card as CommandCard);
+                return SlotCommandCard(index, card as CommandCard);
             else if (card is DamageCard)
-                success = SlotDamageCard(index, card as DamageCard);
+                return SlotDamageCard(index, card as DamageCard);
             else
             {
                 Debug.LogError("Trying to slot a card that is neither damage or command!");
                 return false;
             }
-
-            return success;
         }
 
         private bool SlotCommandCard(int index, CommandCard card)
