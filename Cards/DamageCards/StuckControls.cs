@@ -33,10 +33,5 @@ namespace MvM
         {
             return "Damage: Stuck Controls " + (isMove ? "Move " : "Turn ") + direction;
         }
-
-        public override void InitializeCardExecution(Unit unit)
-        {
-            base.InitializeCardExecution(unit);
-        }
     }
 }

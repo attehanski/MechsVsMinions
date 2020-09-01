@@ -8,6 +8,7 @@ namespace MvM
     {
         public GameObject model;
         public GameObject highlight;
+        public bool towable = false;
         public bool canPush;
         public bool canBePushed;
 

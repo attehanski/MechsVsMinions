@@ -24,7 +24,14 @@ namespace MvM
         public virtual void SlotDamageCard()
         {
             int slot = GameMaster.Instance.GetDiceRoll();
+            Debug.Log("Slotting Damage " + text + " to slot " + slot);
             GameMaster.Instance.SlotCard(UIMaster.Instance.cardSlots[slot], this);
+        }
+
+        public override void InitializeCardExecution(Unit unit)
+        {
+            base.InitializeCardExecution(unit);
+            cardState = CardState.NoInputRequired;
         }
     }
 }

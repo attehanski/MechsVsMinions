@@ -6,6 +6,11 @@ namespace MvM
 {
     public class Champion : Unit
     {
+        public Champion()
+        {
+            towable = true;
+        }
+
         public void PickUpCrystal(CrystalPickable crystal)
         {
 

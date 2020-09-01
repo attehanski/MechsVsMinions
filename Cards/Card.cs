@@ -48,6 +48,7 @@ namespace MvM
             unit = executingUnit;
             startSquare = executingUnit.mapSquare;
             startFacingDirection = executingUnit.facingDirection;
+            actionsExecuted = false;
         }
 
         public virtual void ExecuteCard()

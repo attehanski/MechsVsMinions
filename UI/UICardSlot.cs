@@ -22,13 +22,16 @@ namespace MvM
                 if ((card.cardData as CommandCard).cardColor != (cards[cards.Count - 1].cardData as CommandCard).cardColor)
                     ClearCards();
                 else if (cards.Count > 2)
-                    cards.Remove(cards[0]);
+                    RemoveCard(cards[0]);
             }
             AddCard(card);
         }
 
         public void SlotCard(Card card)
         {
+            // TODO: Change this check to come from the code that discards the card in the data.
+            if (cards.Count > 0 && card is DamageCard && cards[cards.Count - 1].cardData is DamageCard)
+                RemoveCard(cards[cards.Count - 1]);
             AddCard(UIMaster.InstantiateCard(card, rect));
         }
 
@@ -48,20 +51,26 @@ namespace MvM
 
         public override void AddCard(UICard card)
         {
-            foreach (UICard slottedCard in cards)
-            {
-                slottedCard.button.interactable = false;
-                slottedCard.canvas.sortingOrder = 1;
-            }
             base.AddCard(card);
             card.SetHighlightState(UIHighlight.HighlightState.Inactive);
-            card.canvas.sortingOrder = 2;
+            UpdateCardValues();
+        }
+
+        private void UpdateCardValues()
+        {
+            foreach (UICard slottedCard in cards)
+            {
+                PlaceCard(slottedCard);
+                slottedCard.button.interactable = cards.IndexOf(slottedCard) == cards.Count - 1;
+                slottedCard.canvas.sortingOrder = cards.IndexOf(slottedCard) + 1;
+            }
         }
 
         public override void RemoveCard(UICard card)
         {
             base.RemoveCard(card);
             Destroy(card.gameObject);
+            UpdateCardValues();
         }
 
         protected override void PlaceCard(UICard card)
