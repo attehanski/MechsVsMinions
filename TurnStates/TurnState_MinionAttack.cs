@@ -36,8 +36,8 @@ namespace MvM
             {
                 if (!GameMaster.Instance.GetAllPlayersReady() && !damageInAction)
                 {
-                    GameMaster.Instance.DoPlayerDamage(GameMaster.Instance.currentPlayer); // NOTE: Change to cycle through all players
                     damageInAction = true;
+                    GameMaster.Instance.DoPlayerDamage(GameMaster.Instance.currentPlayer); // NOTE: Change to cycle through all players
                 }
             }
         }
@@ -48,7 +48,7 @@ namespace MvM
             {
                 base.AllPlayersReady();
             }
-            else
+            else if (!damageInAction)
             {
                 GameMaster.Instance.SetAllPlayersReady(false);
                 minionAttackFinished = true;

@@ -9,6 +9,7 @@ namespace MvM
         public CatastrophicFailure()
         {
             slottable = false;
+            text = "Take 2 dmg";
         }
 
         public override void ExecuteCard()

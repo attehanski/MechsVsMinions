@@ -5,6 +5,7 @@ using System.Linq;
 
 namespace MvM
 {
+    // TODO: Split into smaller pieces
     public class GameMaster : Singleton<GameMaster>
     {
         [System.Serializable]
@@ -159,8 +160,8 @@ namespace MvM
                 damageCardDeck.AddTop(new StuckControls(Tools.Facing.Back, false));
             }
             // if (unlockedForScenario)
-            //damageCardDeck.AddTop(new RocketWhoopsie());
-            //damageCardDeck.AddTop(new CatastrophicFailure());
+            damageCardDeck.AddTop(new RocketWhoopsie());
+            //damageCardDeck.AddTop(new CatastrophicFailure()); // TODO: Requires fixing
             //damageCardDeck.AddTop(new BeamMisfire());
 
             damageCardDeck = ShuffleDeck(damageCardDeck);
@@ -481,6 +482,7 @@ namespace MvM
             StartCoroutine(HandlePlayerDamage(player));
         }
 
+        // TODO: Change so this works better when taking damage outside of minion attack turn
         private IEnumerator HandlePlayerDamage(Player player)
         {
             // NOTE: Current solution doesn't handle minion order in any way
@@ -488,7 +490,7 @@ namespace MvM
 
             // Take damage for all cardinal directions
             List<Tools.Direction> damageDirections = new List<Tools.Direction> { Tools.Direction.North, Tools.Direction.East, Tools.Direction.West, Tools.Direction.South };
-            // if (hasSpecificDamage) // If player has the specific damage that causes them to take diagonal damage
+            // if (hasSpecificDamage) // TODO: If player has the specific damage that causes them to take diagonal damage, to be added later
             //  damageDirections.AddRange(new Tools.Direction[] { Tools.Direction.NorthEast, Tools.Direction.NorthWest, Tools.Direction.SouthEast, Tools.Direction.SouthWest });
             foreach (Tools.Direction dir in damageDirections)
                 if (player.character.mapSquare.HasNeighbour(dir) && player.character.mapSquare.neighbours[dir].unit is Minion)
@@ -499,12 +501,13 @@ namespace MvM
             
             for (int i = 0; i < damageAmount; i++)
             {
+                player.ready = false;
                 player.character.TakeDamage(Tools.Color.None);
-                yield return new WaitForSeconds(1f);
+                yield return UIMaster.Instance.ShowDamageCard(damageCardDiscard.PeekTop(), player); // NOTE: Using the top card from discard is a hacky hack
             }
-            player.ready = true; // NOTE: Change to rotate current player
-
-            TurnState_MinionAttack turnState = currentTurnState as TurnState_MinionAttack;
+            
+            player.ready = true;
+            TurnState_MinionAttack turnState = currentTurnState as TurnState_MinionAttack; // TODO: This needs to go as player can take damage outside of minion attack
             turnState.damageInAction = false;
 
             yield return null;
@@ -531,6 +534,7 @@ namespace MvM
         #endregion
 
         #region Experimental UI interaction
+
         // NOTE: This should be removed in lieu of a better system.
         public void UpdateUIState()
         {
@@ -595,6 +599,7 @@ namespace MvM
                     else if (slot1 != slot)
                     {
                         SwapSlots(currentPlayer, slot1.index, slot.index);
+                        currentPlayer.hand.Remove(currentPlayer.currentCard);
                         UIMaster.Instance.handPanel.RemoveCard(currentPlayer.currentCard);
                         DiscardCard(currentPlayer.currentCard);
                         UIMaster.Instance.SelectedSwapItem = null;
@@ -615,6 +620,7 @@ namespace MvM
             slot.SlotCard(card);
         }
 
+        // TODO: Cut into smaller pieces
         public void Scrap()
         {
             if (currentPlayer.currentCard == null)
@@ -645,10 +651,11 @@ namespace MvM
                 int unDamagedSlots = 0;
                 for (int i = 0; i < currentPlayer.commandLine.cards.Length; i++)
                 {
-                    if (currentPlayer.commandLine.cards[i].Count > 0 && !(currentPlayer.commandLine.cards[i].PeekTop() is DamageCard))
+                    if (currentPlayer.commandLine.cards[i].Count == 0 || !(currentPlayer.commandLine.cards[i].PeekTop() is DamageCard))
                         unDamagedSlots++;
                 }
-                if (unDamagedSlots > 0)
+
+                if (unDamagedSlots > 1)
                 {
                     UIMaster.Instance.state = UIMaster.UIState.ScrapSwap;
                     UIMaster.Instance.ToggleSwapScrap(currentPlayer, true);

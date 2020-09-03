@@ -9,6 +9,7 @@ namespace MvM
         public RocketWhoopsie()
         {
             slottable = true;
+            text = "Move 3, turn back";
         }
 
         public override void ExecuteCard()

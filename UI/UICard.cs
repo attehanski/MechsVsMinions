@@ -68,7 +68,7 @@ namespace MvM
         {
             if (eventData.button == PointerEventData.InputButton.Right)
             {
-                cardCloseup = CreateCloseup();
+                cardCloseup = CreateCloseup(cardData);
             }
         }
 
@@ -81,12 +81,17 @@ namespace MvM
             }
         }
 
-        private UICard CreateCloseup()
+        public static UICard CreateCloseup(Card card)
+        {
+            return CreateCloseup(card, new Vector3(Screen.width / 2, Screen.height / 2, 0f), 3f);
+        }
+
+        public static UICard CreateCloseup(Card card, Vector3 position, float scaleMultiplier)
         {
             UICard closeup = Instantiate(Prefabs.Instance.card, UIMaster.Instance.transform).GetComponent<UICard>();
-            closeup.InitCard(cardData);
-            closeup.rect.localScale *= 3;
-            closeup.rect.position = new Vector3(Screen.width / 2, Screen.height / 2, 0f);
+            closeup.InitCard(card);
+            closeup.rect.localScale *= scaleMultiplier;
+            closeup.rect.position = position;
             closeup.canvas.sortingOrder = 4;
             closeup.button.interactable = false;
             return closeup;

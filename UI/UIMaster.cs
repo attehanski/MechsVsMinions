@@ -32,6 +32,7 @@ namespace MvM
         public UICardSlot[] cardSlots;
         public GameObject continueButton;
         public UIMultiButton multiButton;
+        public GameObject towButton;
 
         [Header("Panels")]
         public UIWinLosePanel winLostPanel;
@@ -179,6 +180,15 @@ namespace MvM
             UICard.InitCard(card);
 
             return UICard;
+        }
+
+        public IEnumerator ShowDamageCard(Card card, Player player)
+        {
+            UICard cardCloseup = UICard.CreateCloseup(card, new Vector3(9.2f * (Screen.width / 10), 6.2f * (Screen.height / 10), 0f), 1.5f);
+            UIMaster.Instance.UpdateMultiButtonState(UIMultiButton.MultiButtonState.Ready);
+            while (!player.ready)
+                yield return null;
+            Destroy(cardCloseup.gameObject);
         }
         #endregion
     }

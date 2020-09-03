@@ -13,7 +13,7 @@ namespace MvM
         {
             slot1 = swapSlot1;
             slot2 = swapSlot2;
-            text = "Glitch " + slot1 + " - " + slot2;
+            text = "Swap slots " + (slot1+1) + " and " + (slot2+1);
         }
 
         public override void ExecuteCard()

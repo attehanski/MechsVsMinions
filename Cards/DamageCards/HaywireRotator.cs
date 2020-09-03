@@ -11,6 +11,7 @@ namespace MvM
         public HaywireRotator()
         {
             slottable = true;
+            text = "Turn rnd direction";
         }
 
         public override void ExecuteCard()

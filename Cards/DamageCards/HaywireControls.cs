@@ -11,6 +11,7 @@ namespace MvM
         public HaywireControls()
         {
             slottable = true;
+            text = "Move 2 rnd";
         }
 
         public override void ExecuteCard()

@@ -6,6 +6,11 @@ namespace MvM
 {
     public class MajorGlitch : DamageCard
     {
+        public MajorGlitch()
+        {
+            text = "Swap 1-6 2-5 3-4";
+        }
+
         public override void ExecuteCard()
         {
             GameMaster.Instance.SwapSlots(GameMaster.Instance.currentPlayer, 0, 5);
