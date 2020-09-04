@@ -18,9 +18,9 @@ namespace MvM
             return true;
         }
 
-        public override void IsCollided(Unit collidingUnit)
+        public override void IsCollided(Unit collidingUnit, Tools.Direction collisionDirection)
         {
-            base.IsCollided(collidingUnit);
+            base.IsCollided(collidingUnit, collisionDirection);
             TakeDamage(Tools.Color.None);
         }
     }

@@ -36,10 +36,10 @@ namespace MvM
             character = GameMaster.Instance.currentPlayer.character;
             currentCard = GameMaster.Instance.currentPlayer.currentCard;
             ready = GameMaster.Instance.currentPlayer.ready;
-            deck = GameMaster.Instance.commandCardDeck.ToArray();
-            discard = GameMaster.Instance.commandCardDiscard.ToArray();
-            damageDeck = GameMaster.Instance.damageCardDeck.ToArray();
-            damageDiscard = GameMaster.Instance.damageCardDiscard.ToArray();
+            deck = GameMaster.Instance.commandCardDeck.deck.ToArray();
+            discard = GameMaster.Instance.commandCardDeck.discard.ToArray();
+            damageDeck = GameMaster.Instance.damageCardDeck.deck.ToArray();
+            damageDiscard = GameMaster.Instance.damageCardDeck.discard.ToArray();
 
             if (GameMaster.Instance.currentPlayer.commandLine != null)
                 for (int i = 0; i < 6; i++)

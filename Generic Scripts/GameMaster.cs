@@ -72,12 +72,9 @@ namespace MvM
         public Scenario scenario;
         public Player currentPlayer;
         public Card cardBeingExecuted;
-        public CardStack<CommandCard> commandCardDeck = new CardStack<CommandCard>();
-        public CardStack<CommandCard> commandCardDiscard = new CardStack<CommandCard>();
-        public CardStack<DamageCard> damageCardDeck = new CardStack<DamageCard>();
-        public CardStack<DamageCard> damageCardDiscard = new CardStack<DamageCard>();
-        //public CardStack<BossCard> bossCardDeck = new CardStack<BossCard>();
-        //public CardStack<BossCard> bossCardDiscard = new CardStack<BossCard>();
+        public Deck<CommandCard> commandCardDeck = new Deck<CommandCard>();
+        public Deck<DamageCard> damageCardDeck = new Deck<DamageCard>();
+        //public Deck<BossCard> bossCardDeck = new CardStack<BossCard>();
         
         [HideInInspector]
         public MapSquare interactedSquare;
@@ -117,83 +114,81 @@ namespace MvM
             for (int i = 0; i < 8; i++)
             {
                 // Turn cards
-                commandCardDeck.AddTop(new FuelTank());
-                commandCardDeck.AddTop(new Scythe());
-                commandCardDeck.AddTop(new MemoryCore());
-                commandCardDeck.AddTop(new Cyclotron());
+                commandCardDeck.AddCardToDeck(new FuelTank());
+                commandCardDeck.AddCardToDeck(new Scythe());
+                commandCardDeck.AddCardToDeck(new MemoryCore());
+                commandCardDeck.AddCardToDeck(new Cyclotron());
 
                 // Move cards
-                commandCardDeck.AddTop(new Blaze());
-                commandCardDeck.AddTop(new Skewer());
-                commandCardDeck.AddTop(new Omnistomp());
-                commandCardDeck.AddTop(new Speed());
+                commandCardDeck.AddCardToDeck(new Blaze());
+                commandCardDeck.AddCardToDeck(new Skewer());
+                commandCardDeck.AddCardToDeck(new Omnistomp());
+                commandCardDeck.AddCardToDeck(new Speed());
 
                 // Attack cards
-                commandCardDeck.AddTop(new Flamespitter());
-                commandCardDeck.AddTop(new Ripsaw());
-                commandCardDeck.AddTop(new HexmaticAimbot());
-                commandCardDeck.AddTop(new ChainLightning());
+                commandCardDeck.AddCardToDeck(new Flamespitter());
+                commandCardDeck.AddCardToDeck(new Ripsaw());
+                commandCardDeck.AddCardToDeck(new HexmaticAimbot());
+                commandCardDeck.AddCardToDeck(new ChainLightning());
             }
-            commandCardDeck = ShuffleDeck(commandCardDeck);
+            commandCardDeck.ShuffleDeck();
             #endregion
 
             #region Initialize Damage Card Deck
             for (int i = 0; i < 4; i++)
             {
-                damageCardDeck.AddTop(new Glitch(0, 1));
-                damageCardDeck.AddTop(new Glitch(2, 3));
-                damageCardDeck.AddTop(new Glitch(4, 5));
+                damageCardDeck.AddCardToDeck(new Glitch(0, 1));
+                damageCardDeck.AddCardToDeck(new Glitch(2, 3));
+                damageCardDeck.AddCardToDeck(new Glitch(4, 5));
             }
             for (int i = 0; i < 3; i++)
             {
-                damageCardDeck.AddTop(new MajorGlitch());
-                damageCardDeck.AddTop(new StuckControls(Tools.Facing.Left, true));
-                damageCardDeck.AddTop(new StuckControls(Tools.Facing.Left, true));
-                damageCardDeck.AddTop(new StuckControls(Tools.Facing.Right, false));
-                damageCardDeck.AddTop(new StuckControls(Tools.Facing.Right, false));
-                damageCardDeck.AddTop(new HaywireControls());
-                damageCardDeck.AddTop(new HaywireRotator());
+                damageCardDeck.AddCardToDeck(new MajorGlitch());
+                damageCardDeck.AddCardToDeck(new StuckControls(Tools.Facing.Left, true));
+                damageCardDeck.AddCardToDeck(new StuckControls(Tools.Facing.Left, true));
+                damageCardDeck.AddCardToDeck(new StuckControls(Tools.Facing.Right, false));
+                damageCardDeck.AddCardToDeck(new StuckControls(Tools.Facing.Right, false));
+                damageCardDeck.AddCardToDeck(new HaywireControls());
+                damageCardDeck.AddCardToDeck(new HaywireRotator());
             }
             for (int i = 0; i < 2; i++)
             {
-                damageCardDeck.AddTop(new StuckControls(Tools.Facing.Back, true));
-                damageCardDeck.AddTop(new StuckControls(Tools.Facing.Back, false));
+                damageCardDeck.AddCardToDeck(new StuckControls(Tools.Facing.Back, true));
+                damageCardDeck.AddCardToDeck(new StuckControls(Tools.Facing.Back, false));
             }
             // if (unlockedForScenario)
-            damageCardDeck.AddTop(new RocketWhoopsie());
-            //damageCardDeck.AddTop(new CatastrophicFailure()); // TODO: Requires fixing
-            //damageCardDeck.AddTop(new BeamMisfire());
+            damageCardDeck.AddCardToDeck(new RocketWhoopsie());
+            //dmgCardDeck.AddCardToDeck(new CatastrophicFailure()); // TODO: Requires fixing
+            //dmgCardDeck.AddCardToDeck(new BeamMisfire());
 
-            damageCardDeck = ShuffleDeck(damageCardDeck);
+            damageCardDeck.ShuffleDeck();
             #endregion
 
             #region Initialize Boss Card Deck
-            // NOTE: Move to Scenario? Move to separate function only called from Scenario?
+            // NOTE: Move to Scenario? Move to separate function only called from Scenario? Move to a separate Decks class?
             //for (int i = 0; i < 2; i++)
             //{
-            //bossCardDeck.AddTop(new AxeCannon());
-            //bossCardDeck.AddTop(new RunicShrapnel());
-            //bossCardDeck.AddTop(new Quadrabeam());
-            //bossCardDeck.AddTop(new Recharge());
-            //bossCardDeck.AddTop(new Electrostomp());
-            //bossCardDeck.AddTop(new Charge());
-            //bossCardDeck.AddTop(new GetOverHere());
-            //bossCardDeck.AddTop(new MechMagnet());
-            //bossCardDeck.AddTop(new Scrambulator());
-            //bossCardDeck.AddTop(new FireStorm());
-            //bossCardDeck.AddTop(new FlameNova());
-            //bossCardDeck.AddTop(new AxeStrike());
+            //bossCardDeck.AddCardToDeck(new AxeCannon());
+            //bossCardDeck.AddCardToDeck(new RunicShrapnel());
+            //bossCardDeck.AddCardToDeck(new Quadrabeam());
+            //bossCardDeck.AddCardToDeck(new Recharge());
+            //bossCardDeck.AddCardToDeck(new Electrostomp());
+            //bossCardDeck.AddCardToDeck(new Charge());
+            //bossCardDeck.AddCardToDeck(new GetOverHere());
+            //bossCardDeck.AddCardToDeck(new MechMagnet());
+            //bossCardDeck.AddCardToDeck(new Scrambulator());
+            //bossCardDeck.AddCardToDeck(new FireStorm());
+            //bossCardDeck.AddCardToDeck(new FlameNova());
+            //bossCardDeck.AddCardToDeck(new AxeStrike());
             //}
-            //bossCardDeck = ShuffleDeck(bossCardDeck);
+            //bossCardDeck.ShuffleDeck();
             #endregion
         }
 
         public void ResetDecks()
         {
             commandCardDeck.Clear();
-            commandCardDiscard.Clear();
             damageCardDeck.Clear();
-            damageCardDiscard.Clear();
             //bossCardDeck.Clear();
             //bossCardDiscard.Clear();
         }
@@ -311,7 +306,7 @@ namespace MvM
         public void RepairCommandSlot(Player player, int slotIndex)
         {
             // Data handling
-            DiscardCard(player.commandLine.cards[slotIndex].PopTop());
+            damageCardDeck.DiscardCard(player.commandLine.cards[slotIndex].PopTop() as DamageCard);
 
             // NOTE: Not sure about this being in here, data and UI should be separated more efficiently
             // UI handling
@@ -356,89 +351,6 @@ namespace MvM
             foreach (Player player in players)
                 player.ready = readyState;
         }
-
-        #region Deck & Discard handling
-        /// <summary>
-        /// Shuffles the deck using the Fisher-Yates algorithm.
-        /// </summary>
-        public CardStack<T> ShuffleDeck<T>(CardStack<T> deck)
-        {
-            var cards = deck.ToArray();
-            for (int i = cards.Length - 1; i > 0; i--)
-            {
-                int random = Random.Range(0, i);
-                var temp = cards[random];
-                cards[random] = cards[i];
-                cards[i] = temp;
-            }
-
-            CardStack<T> newStack = new CardStack<T>();
-            foreach (var card in cards)
-            {
-                newStack.AddTop(card);
-            }
-
-            deck = newStack;
-
-            return deck;
-        }
-
-        public (CardStack<T>, CardStack<T>) ResetDeck<T>(CardStack<T> deck, CardStack<T> discard)
-        {
-            deck = new CardStack<T>(discard);
-            discard.Clear();
-            ShuffleDeck(deck);
-
-            return (deck, discard);
-        }
-
-        public Card DrawCard(Card.Type type)
-        {
-            Card drawnCard = null;
-            switch (type)
-            {
-                case Card.Type.Command:
-                    if (commandCardDeck.Count < 1)
-                        (commandCardDeck, commandCardDiscard) = ResetDeck(commandCardDeck, commandCardDiscard);
-                    drawnCard = commandCardDeck.PopTop();
-                    break;
-
-                case Card.Type.Damage:
-                    if (damageCardDeck.Count < 1)
-                        (damageCardDeck, damageCardDiscard) = ResetDeck(damageCardDeck, damageCardDiscard);
-                    drawnCard = damageCardDeck.PopTop();
-                    break;
-
-                case Card.Type.Boss:
-                    break;
-
-                default:
-                    break;
-            }
-
-            return drawnCard;
-        }
-
-        public void DiscardCard(Card card)
-        {
-            switch (card.type)
-            {
-                case Card.Type.Command:
-                    commandCardDiscard.AddTop(card as CommandCard);
-                    return;
-
-                case Card.Type.Damage:
-                    damageCardDiscard.AddTop(card as DamageCard);
-                    return;
-
-                case Card.Type.Boss:
-                    return;
-
-                default:
-                    return;
-            }
-        }
-        #endregion
 
         #region Unit handling
         public Unit SpawnUnit(GameObject spawningUnit, MapSquare square)
@@ -503,7 +415,7 @@ namespace MvM
             {
                 player.ready = false;
                 player.character.TakeDamage(Tools.Color.None);
-                yield return UIMaster.Instance.ShowDamageCard(damageCardDiscard.PeekTop(), player); // NOTE: Using the top card from discard is a hacky hack
+                yield return UIMaster.Instance.ShowDamageCard(damageCardDeck.discard.PeekTop(), player); // NOTE: Using the top card from discard is a hacky hack
             }
             
             player.ready = true;
@@ -583,7 +495,7 @@ namespace MvM
                 {
                     RepairCommandSlot(currentPlayer, slot.index);
                     UIMaster.Instance.handPanel.RemoveCard(currentPlayer.currentCard);
-                    DiscardCard(currentPlayer.currentCard);
+                    commandCardDeck.DiscardCard(currentPlayer.currentCard as CommandCard);
                     UIMaster.Instance.ToggleRepairScrap(currentPlayer, false);
                     (currentTurnState as TurnState_Draft).CardSlotted();
                     UpdateUIState();
@@ -601,7 +513,7 @@ namespace MvM
                         SwapSlots(currentPlayer, slot1.index, slot.index);
                         currentPlayer.hand.Remove(currentPlayer.currentCard);
                         UIMaster.Instance.handPanel.RemoveCard(currentPlayer.currentCard);
-                        DiscardCard(currentPlayer.currentCard);
+                        commandCardDeck.DiscardCard(currentPlayer.currentCard as CommandCard);
                         UIMaster.Instance.SelectedSwapItem = null;
                         UIMaster.Instance.ToggleSwapScrap(currentPlayer, false);
                         (currentTurnState as TurnState_Draft).CardSlotted();
@@ -670,7 +582,7 @@ namespace MvM
         private void NoScrapEffect()
         {
             UIMaster.Instance.handPanel.RemoveCard(currentPlayer.currentCard);
-            DiscardCard(currentPlayer.currentCard);
+            commandCardDeck.DiscardCard(currentPlayer.currentCard as CommandCard);
             UIMaster.Instance.ToggleRepairScrap(currentPlayer, false);
             (currentTurnState as TurnState_Draft).CardSlotted();
             UpdateUIState();

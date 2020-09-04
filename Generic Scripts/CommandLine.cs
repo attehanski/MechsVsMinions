@@ -50,7 +50,7 @@ namespace MvM
                 {
                     // If stack is full remove bottom card from stack.
                     if (cards[index].Count == 3)
-                        GameMaster.Instance.DiscardCard(cards[index].PopBottom());
+                        GameMaster.Instance.commandCardDeck.DiscardCard(cards[index].PopBottom() as CommandCard);
 
                     card.level = Mathf.Min(3, oldTopCard.level + 1);
                 }
@@ -59,7 +59,7 @@ namespace MvM
                 {
                     int stackSize = cards[index].Count;
                     for (int i = 0; i < stackSize; i++)
-                        GameMaster.Instance.DiscardCard(cards[index].PopTop());
+                        GameMaster.Instance.commandCardDeck.DiscardCard(cards[index].PopTop() as CommandCard);
                 }
             }
 
@@ -73,7 +73,7 @@ namespace MvM
             if (cards[index].Count > 0)
             {
                 if (cards[index].PeekTop() is DamageCard)
-                    GameMaster.Instance.DiscardCard(cards[index].PopTop());
+                    GameMaster.Instance.damageCardDeck.DiscardCard(cards[index].PopTop() as DamageCard);
             }
 
             cards[index].AddTop(card);
@@ -127,6 +127,7 @@ namespace MvM
                 {
                     if (cardBeingExecuted.cardState != Card.CardState.NoInputRequired)
                     {
+                        Debug.Log("Show input options!");
                         if (ShowInputOptions(cardBeingExecuted))
                         {
                             yield return WaitForInput();
@@ -138,6 +139,7 @@ namespace MvM
                     cardBeingExecuted.UpdateCardState();
                 }
                 UIMaster.Instance.UpdateMultiButtonState(UIMultiButton.MultiButtonState.Ready);
+                UIMaster.Instance.towButton.SetActive(false);
                 yield return WaitForPlayerReady(player);
 
                 UIMaster.Instance.cardSlots[slotIndex].SetHighlightState(UIHighlight.HighlightState.Inactive);

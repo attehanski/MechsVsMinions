@@ -100,14 +100,20 @@ namespace MvM
             newSquare.unit = this;
         }
 
-        public virtual void Collide(Unit collisionTarget)
+        public virtual void Collide(Unit collisionTarget, Tools.Direction collisionDirection)
         {
-            // Handle whatever happens to this unit
+            Debug.Log(name + " collided with " + collisionTarget.name);
         }
 
-        public virtual void IsCollided(Unit collidingUnit)
+        public virtual void IsCollided(Unit collidingUnit, Tools.Direction collisionDirection)
         {
-            mapSquare.unit = collidingUnit;
+            Debug.Log(name + " got collided by " + collidingUnit.name);
+            if (canBePushed && collidingUnit.canPush)
+            {
+                mapSquare.unit = collidingUnit;
+                Move(collisionDirection);
+                ExecuteActions();
+            }
         }
 
         #endregion
@@ -129,7 +135,6 @@ namespace MvM
         public virtual void TakeDamage(Tools.Color damageColor = Tools.Color.None)
         {
             ShowDamageEffect(damageColor);
-            //Debug.Log("Unit " + name + " took damage!");
         }
 
         protected virtual void ShowDamageEffect(Tools.Color damageColor)

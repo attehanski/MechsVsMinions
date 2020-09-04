@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MvM
 {
-    public class Champion : Unit
+    public class Champion : Unit, IRepairable
     {
         public Champion()
         {
@@ -20,25 +20,29 @@ namespace MvM
         {
             if (replacingUnit is Minion)
                 return false;
-            else if (replacingUnit is Champion /*|| replacingUnit is Bomb*/)
+            else if (replacingUnit is Champion || replacingUnit is Bomb)
                 return CanMove(direction);
             return true;
         }
 
-        public override void Collide(Unit collisionTarget)
+        public override void Collide(Unit collisionTarget, Tools.Direction collisionDirection)
         {
-            base.Collide(collisionTarget);
+            base.Collide(collisionTarget, collisionDirection);
         }
 
         public override void TakeDamage(Tools.Color damageColor = Tools.Color.None)
         {
-            DamageCard damage = GameMaster.Instance.DrawCard(Card.Type.Damage) as DamageCard;
+            DamageCard damage = GameMaster.Instance.damageCardDeck.DrawCard();
             Debug.Log("Champion taking damage! " + damage.ToString());
             damage.ExecuteCard();
             if (damage.slottable) damage.SlotDamageCard();
-            GameMaster.Instance.DiscardCard(damage);
+            GameMaster.Instance.damageCardDeck.DiscardCard(damage);
             base.TakeDamage(damageColor);
         }
 
+        public void RepairUnit()
+        {
+            Debug.Log("Repair player character!");
+        }
     }
 }

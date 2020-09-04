@@ -203,5 +203,16 @@ namespace MvM
             if (unit == null) return false;
             return unit is Minion || unit is CrystalDestroyable; /*|| neighbour.Value.unit is Boss*/
         }
+
+        public static bool DirectionIsCardinal(Direction direction)
+        {
+            if (direction == Direction.East ||
+                direction == Direction.North ||
+                direction == Direction.South ||
+                direction == Direction.West)
+                return true;
+
+            return false;
+        }
     }
 }

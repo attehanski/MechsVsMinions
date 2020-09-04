@@ -142,8 +142,8 @@ namespace MvM
         {
             if (unit)
             {
-                unit.IsCollided(movingUnit);
-                movingUnit.Collide(unit);
+                movingUnit.Collide(unit, direction);
+                unit.IsCollided(movingUnit, direction);
             }
         }        
         

@@ -21,6 +21,8 @@ namespace MvM
             inputSquares.Clear();
             inputOptionFacings.Clear();
 
+            CheckTowingStatus();
+
             Tools.Facing[] possibleFacings;
             if (doneMoves == 0)
                 possibleFacings = new Tools.Facing[] { Tools.Facing.Left, Tools.Facing.Right, Tools.Facing.Forward };

@@ -9,7 +9,8 @@ namespace MvM
         public override void MoveToSquare(Unit unit, Tools.Direction direction)
         {
             base.MoveToSquare(unit, direction);
-            Debug.Log("Player stepped on repair pad!");
+            if (unit is IRepairable)
+                (unit as IRepairable).RepairUnit();
         }
     }
 }

@@ -11,7 +11,7 @@ namespace MvM
             return true;
         }
 
-        public override void IsCollided(Unit collidingUnit)
+        public override void IsCollided(Unit collidingUnit, Tools.Direction collisionDirection)
         {
             if (collidingUnit is Champion)
             {

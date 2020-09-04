@@ -55,9 +55,7 @@ namespace MvM
         {
             draftCards.Clear(); // NOTE: Check if this is necessary
             for (int i = 0; i < amount; i++)
-            {
-                draftCards.Add(GameMaster.Instance.DrawCard(Card.Type.Command) as CommandCard);
-            }
+                draftCards.Add(GameMaster.Instance.commandCardDeck.DrawCard());
         }
 
         public override void AllPlayersReady()

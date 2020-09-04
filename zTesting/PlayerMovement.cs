@@ -79,14 +79,14 @@ namespace MvM
 
             if (Input.GetKeyDown(KeyCode.Alpha0))
             {
-                DamageCard dmg = GameMaster.Instance.DrawCard(Card.Type.Damage) as DamageCard;
+                DamageCard dmg = GameMaster.Instance.damageCardDeck.DrawCard();
                 dmg.ExecuteCard();
-                GameMaster.Instance.DiscardCard(dmg);
+                GameMaster.Instance.damageCardDeck.DiscardCard(dmg);
             }
 
             if (Input.GetKeyDown(KeyCode.Alpha3))
             {
-                Card drawnDamage = GameMaster.Instance.DrawCard(Card.Type.Damage);
+                Card drawnDamage = GameMaster.Instance.damageCardDeck.DrawCard();
                 GameMaster.Instance.currentPlayer.commandLine.SlotCard(2, drawnDamage);
                 UIMaster.Instance.cardSlots[2].SlotCard(drawnDamage);
             }

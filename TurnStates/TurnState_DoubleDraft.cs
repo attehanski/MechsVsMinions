@@ -51,7 +51,7 @@ namespace MvM
                 draftStage = 1;
                 GameMaster.Instance.UpdateUIState();
                 foreach (Card card in draftCards)
-                    GameMaster.Instance.DiscardCard(card);
+                    GameMaster.Instance.commandCardDeck.DiscardCard(card as CommandCard);
 
                 // UI
                 UIMaster.Instance.draftPanel.EndDraft();
